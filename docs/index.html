@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DAZZ Docs</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      background: #f5f5f0;
+      color: #1a1a2e;
+    }
+
+    /* ─── Sidebar ─── */
+    #sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: #12121f;
+      color: #d4d4d4;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .logo {
+      padding: 28px 20px 20px;
+      font-size: 20px;
+      font-weight: 800;
+      color: #c9a84c;
+      letter-spacing: 2px;
+      border-bottom: 1px solid #2a2a3e;
+    }
+    .logo span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: #666680;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    nav { padding: 16px 0; }
+
+    .nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 20px;
+      text-decoration: none;
+      color: #9090a8;
+      font-size: 13px;
+      line-height: 1.5;
+      transition: background 0.15s, color 0.15s;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover { background: #1e1e32; color: #d4d4d4; }
+    .nav-item.active {
+      background: #1e1e32;
+      color: #c9a84c;
+      border-left-color: #c9a84c;
+    }
+    .nav-num {
+      font-size: 10px;
+      color: #444460;
+      min-width: 18px;
+      margin-top: 2px;
+      font-family: monospace;
+    }
+    .nav-item.active .nav-num { color: #a07830; }
+    .nav-label { line-height: 1.4; }
+
+    /* ─── Main ─── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #topbar {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 14px 32px;
+      font-size: 13px;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #topbar strong { color: #1a1a2e; font-size: 14px; }
+
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 48px 80px;
+    }
+
+    /* ─── Markdown Body ─── */
+    #markdown-body {
+      max-width: 820px;
+      margin: 0 auto;
+      line-height: 1.8;
+      color: #1a1a2e;
+    }
+
+    #markdown-body h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #12121f;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #c9a84c;
+    }
+    #markdown-body h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 40px 0 12px;
+      color: #1a1a2e;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #e8e8e0;
+    }
+    #markdown-body h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 28px 0 8px;
+      color: #2a2a4e;
+    }
+    #markdown-body h4 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 20px 0 6px;
+      color: #444;
+    }
+
+    #markdown-body p { margin: 10px 0; }
+
+    #markdown-body blockquote {
+      border-left: 4px solid #c9a84c;
+      background: #faf8f2;
+      padding: 12px 16px;
+      margin: 16px 0;
+      border-radius: 0 6px 6px 0;
+      color: #444;
+    }
+    #markdown-body blockquote p { margin: 4px 0; }
+
+    #markdown-body code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 13px;
+      color: #c7254e;
+    }
+
+    #markdown-body pre {
+      background: #f6f8fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    #markdown-body pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    #markdown-body th {
+      background: #12121f;
+      color: #c9a84c;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    #markdown-body td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e8e8e0;
+    }
+    #markdown-body tr:hover td { background: #faf8f2; }
+    #markdown-body tr:nth-child(even) td { background: #f9f9f6; }
+    #markdown-body tr:nth-child(even):hover td { background: #f4f2ec; }
+
+    #markdown-body ul, #markdown-body ol {
+      padding-left: 24px;
+      margin: 8px 0;
+    }
+    #markdown-body li { margin: 4px 0; }
+
+    #markdown-body hr {
+      border: none;
+      border-top: 1px solid #e8e8e0;
+      margin: 32px 0;
+    }
+
+    #markdown-body a { color: #c9a84c; text-decoration: none; }
+    #markdown-body a:hover { text-decoration: underline; }
+
+    #markdown-body strong { color: #12121f; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+    #sidebar::-webkit-scrollbar-thumb { background: #2a2a3e; }
+  </style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div class="logo">DAZZ<span>설계 문서 뷰어</span></div>
+  <nav>
+    <a class="nav-item active" data-doc="00" onclick="loadDoc(this)">
+      <span class="nav-num">00</span>
+      <span class="nav-label">Overview<br>프로젝트 컨셉 & 비전</span>
+    </a>
+    <a class="nav-item" data-doc="01" onclick="loadDoc(this)">
+      <span class="nav-num">01</span>
+      <span class="nav-label">Requirements<br>기능 요구사항 & NFR</span>
+    </a>
+    <a class="nav-item" data-doc="02" onclick="loadDoc(this)">
+      <span class="nav-num">02</span>
+      <span class="nav-label">Architecture<br>헥사고날 & DDD 원칙</span>
+    </a>
+    <a class="nav-item" data-doc="03" onclick="loadDoc(this)">
+      <span class="nav-num">03</span>
+      <span class="nav-label">Tech Stack<br>기술 선정 & 트레이드오프</span>
+    </a>
+    <a class="nav-item" data-doc="04" onclick="loadDoc(this)">
+      <span class="nav-num">04</span>
+      <span class="nav-label">Schema<br>ERD & 데이터 모델</span>
+    </a>
+    <a class="nav-item" data-doc="05" onclick="loadDoc(this)">
+      <span class="nav-num">05</span>
+      <span class="nav-label">API Spec<br>엔드포인트 명세</span>
+    </a>
+    <a class="nav-item" data-doc="06" onclick="loadDoc(this)">
+      <span class="nav-num">06</span>
+      <span class="nav-label">Conventions<br>코딩 컨벤션 & 안티패턴</span>
+    </a>
+    <a class="nav-item" data-doc="07" onclick="loadDoc(this)">
+      <span class="nav-num">07</span>
+      <span class="nav-label">Concurrency<br>분산락 & 멱등성</span>
+    </a>
+    <a class="nav-item" data-doc="08" onclick="loadDoc(this)">
+      <span class="nav-num">08</span>
+      <span class="nav-label">Fault Tolerance<br>서킷브레이커 & 폴백</span>
+    </a>
+  </nav>
+</aside>
+
+<div id="main">
+  <div id="topbar">
+    DAZZ &rsaquo; <strong id="topbar-title">00 · Overview</strong>
+  </div>
+  <div id="content">
+    <div id="markdown-body"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     문서 내용 (마크다운 원문)
+     ════════════════════════════════════════════ -->
+
+<script type="text/plain" id="doc-00">
+# 00. Project Overview — DAZZ의 컨셉과 비즈니스 맥락
+
+> 이 문서는 DAZZ의 **존재 이유(Why)**를 정의합니다.
+> 모든 기능 설계, 기술 선택, UX 결정은 이 컨셉에 정렬되어야 합니다.
+> 컨셉과 충돌하는 제안은 거절되어야 합니다.
+
+---
+
+## 1. The Concept — 3가지 관점의 자기 정의
+
+### 1.1 3점 정리법 (A가 B하기 위해 C한다)
+
+> **재즈 입문자(A)**가
+> **복잡한 탐색 없이 한국재즈의 매력을 발견하고 향유(B)**할 수 있도록 돕는
+> **올인원 재즈 아카이빙 플랫폼(C)**이 된다.
+
+### 1.2 비교 강조법 (A가 아니라 B다)
+
+> 이것은 **K재즈 백과사전(A)**이 **아니라**, **퍼스널 도슨트(B)**다.
+
+이 구분이 의미하는 바:
+- 백과사전은 **나열**한다 → DAZZ는 **연결**한다
+- 백과사전은 **객관 정보**를 제공한다 → DAZZ는 **전공자의 해석(Insight)**을 제공한다
+- 백과사전은 **검색**으로 끝난다 → DAZZ는 **다음 탐험지를 안내**한다
+
+### 1.3 슬로건
+
+> **"K-Jazz Insight Navigator"**
+
+- **Information** ≠ **Insight**: 단순 정보가 아닌 통찰을 제공
+- **Navigator**: 사용자를 다음 목적지로 안내하는 항해사
+
+---
+
+## 2. 해결하려는 문제 (Problem Statement)
+
+### 2.1 재즈 입문자의 페인 포인트
+- 낯선 한국 재즈 뮤지션의 이름 사이에서 길을 잃는다
+- 어떤 앨범부터, 어떤 아티스트부터 듣기 시작해야 할지 모른다
+- 정보는 흩어져 있고(SNS, 블로그, 공연 사이트), 맥락이 빠져있다
+
+### 2.2 하드코어 팬의 페인 포인트
+- 특정 연주자가 참여한 **세션 정보(Sideman 이력)**까지 디깅하기 어렵다
+- 협업 관계, 사제 관계 등의 **계보**가 정리된 곳이 없다
+
+### 2.3 현역 뮤지션의 페인 포인트
+- 본인의 공연 이력, 앨범, 라인업 정보가 **파편화**되어 있다
+- 기획자/팬에게 보여줄 **정돈된 디지털 이력서**가 없다
+
+---
+
+## 3. 핵심 가치 제안 (Value Proposition)
+
+| 사용자 | 기존 경험 | DAZZ가 제공하는 가치 |
+| --- | --- | --- |
+| 재즈 입문자 | 검색 → 위키 → 막다른 길 | **'파도타기'식 관계 탐색** + 무드별 큐레이션 |
+| 하드코어 팬 | 음반별 크레딧 수동 검색 | **Sideman 이력 통합 검색** + 협업 그래프 |
+| 현역 뮤지션 | SNS 파편화 | **'디지털 이력서' 페이지** + 라인업 자동 연결 |
+
+---
+
+## 4. 핵심 기능 (한 줄 요약)
+
+1. **Interactive Relationship Graph**: 협업 횟수(가중치) 기반 동적 인맥지도
+2. **Contextual Docent**: 협업 지점 클릭 시 시대적/음악적 배경 해설
+3. **Real-time Collaboration Feed**: 새 협업 등록 시 Kafka 기반 실시간 그래프 업데이트
+4. **셀프 브랜딩 포트폴리오**: 뮤지션 직접 관리 페이지
+5. **무드별 큐레이션 가이드**: 비전문가 친화 도슨트 추천
+
+---
+
+## 5. 기술적 차별점 (왜 백엔드 엔지니어링이 본질인가)
+
+- **고성능 조회**: 복잡한 그래프 연산을 Redis Cache-Aside 패턴으로 0.5s 이내 응답
+- **데이터 정합성**: 동시 협업 데이터 등록 시 Redisson 분산락으로 정확한 가중치 계산 보장
+- **시스템 안정성**: 알림/캐시 갱신 등 무거운 후속 작업은 Kafka로 비동기 처리하여 메인 서비스 보호
+
+---
+
+## 6. 컨셉 정합성 체크리스트 (의사결정 시 활용)
+
+- [ ] 이 기능은 **백과사전이 아닌 도슨트**의 역할을 강화하는가?
+- [ ] 사용자에게 **다음 탐험지**를 제시하는가, 아니면 막다른 길에 세우는가?
+- [ ] **전공자의 해석(Insight)**이 자연스럽게 녹아드는 구조인가?
+- [ ] **연결의 품질**을 유지하는가, 데이터를 단순 나열하는가?
+- [ ] 장애 발생 시에도 **도슨트로서의 안내 책임**을 포기하지 않는가?
+
+---
+
+## 7. 안 만들 것 (Non-Goals)
+
+- ❌ **익명 커뮤니티**: 뒷담화/비방 리스크. 실명/인증 기반만 허용
+- ❌ **악기 장터**: 뮬(MULE)이 이미 점유. 컨셉 분산 방지
+- ❌ **별점 리뷰**: 도슨트 컨셉과 상충 (정량 평가 ≠ 통찰)
+- ❌ **자유게시판**: 초기 버전에선 커뮤니티 기능 최소화
+- ❌ **글로벌 재즈 정보**: K-Jazz에 집중 (시장 차별화)
+</script>
+
+<script type="text/plain" id="doc-01">
+# 01. Requirements — User Stories, NFRs, Edge Cases
+
+> 이 문서는 **무엇을** 만들 것인지, **얼마나 잘** 만들어야 하는지, **무엇이 깨질 수 있는지**를 정의합니다.
+> 모든 기능 구현은 여기 명시된 User Story 중 하나에 대응되어야 합니다.
+
+---
+
+## 1. Functional Requirements (User Stories)
+
+### US-01. 음악적 계보 탐색 (입문자용)
+> As a **재즈 입문자**,
+> I want to **특정 아티스트의 프로필에서 그와 협업한 뮤지션들의 관계도를 시각적으로 확인하고 싶다**,
+> so that **낯선 이름들 사이에서 길을 잃지 않고 '파도타기'하듯 내 취향의 아티스트를 자연스럽게 발견할 수 있다.**
+
+- **연관 API**: `GET /api/v1/musicians/{musicianId}/insights?includeNetwork=true&depth=N`
+- **핵심 기술 도전**: 그래프 깊이 탐색의 응답속도 (Redis 캐싱 필수)
+
+### US-02. 심층 아카이빙 검색 (하드코어 팬용)
+> As a **하드코어 재즈 팬**,
+> I want to **단순 앨범 제목뿐만 아니라 특정 연주자가 참여한 세션 정보(Sideman 이력)까지 상세히 검색하고 싶다**,
+> so that **좋아하는 연주자의 숨겨진 참여음반까지 놓치지 않고 디깅(Digging)하는 즐거움을 느낄 수 있다.**
+
+- **연관 도메인**: `ALBUM_PARTICIPATION` (참여 관계 엔티티)
+- **핵심 기술 도전**: 다중 JOIN 최적화 + 복합 인덱스 설계
+
+### US-03. 셀프 브랜딩 포트폴리오 (뮤지션용)
+> As a **현역 재즈 뮤지션**,
+> I want to **나의 최신 공연이력, 앨범, SNS, 주로 활동하는 팀 정보를 직접 업데이트할 수 있는 전용 페이지를 갖고 싶다**,
+> so that **나를 궁금해하는 대중이나 기획자에게 파편화된 정보가 아닌, 정돈된 '디지털 이력서'를 손쉽게 공유할 수 있다.**
+
+- **연관 도메인**: `MUSICIAN ↔ USER` 1:1 Optional 관계
+- **핵심 비즈니스 규칙**: 인증된 뮤지션만 본인 프로필 편집 가능
+
+### US-04. 도슨트 큐레이션 가이드 (공용)
+> As a **한국 재즈가 궁금한 사람**,
+> I want to **'비 오는 날의 재즈피아노'처럼 무드와 장르별로 큐레이션된 아티스트 추천 가이드를 받고 싶다**,
+> so that **전문지식이 없어도 도슨트의 설명을 듣듯 쉽고 재미있게 한국 재즈씬에 입문할 수 있다.**
+
+- **연관 도메인**: `DocentNote`, `Curation`
+
+---
+
+## 2. Non-Functional Requirements (NFRs)
+
+### NFR-01. 데이터 무결성 및 관계 일관성
+
+| 항목 | 내용 |
+| --- | --- |
+| 지표 | 뮤지션-앨범-협업관계 데이터의 참조 무결성 **100%** 유지 |
+| 근거 | '퍼스널 도슨트' 컨셉의 핵심은 정확한 정보 연결. 잘못된 연결 = 신뢰도 파괴 |
+| 아키텍처 영향 | **RDBMS(MySQL) 선택**, ACID 트랜잭션 필수 |
+
+### NFR-02. 탐색 반응속도
+
+| 항목 | 내용 |
+| --- | --- |
+| 지표 | '파도타기' 클릭 시 **p99 0.5초 이내** |
+| 근거 | Navigator 컨셉: 탐색 흐름이 끊기면 컨셉 자체가 무너짐 |
+| 아키텍처 영향 | **Redis In-memory 캐시 필수** |
+
+### NFR-03. 확장 가능성 및 가용성
+
+| 항목 | 내용 |
+| --- | --- |
+| 지표 | 피크 트래픽(평소 5배) 대응, **99.9% 가용성** |
+| 근거 | 공연 예매 오픈, 유명 연주자 이슈 등 트래픽 스파이크 대응 |
+| 아키텍처 영향 | **Load Balancer + Stateless Scale-out**, Kafka 비동기 |
+
+---
+
+## 3. Edge Cases (컨셉을 무너뜨릴 수 있는 케이스)
+
+### EC-01. 허위/장난 뮤지션 프로필 선점
+- **시나리오**: 검증되지 않은 사용자가 유명 뮤지션 이름으로 프로필 생성
+- **Policy**: 초기 가입 시 학력/활동 증빙 업로드 요구, 관리자 승인 전까지 `Unverified` 마크
+
+### EC-02. 동명이인 뮤지션 데이터 오염
+- **시나리오**: '김재즈' 피아니스트와 '김재즈' 드러머의 데이터가 뒤섞임
+- **Policy**: **UUID 기반 고유 식별자**, 협업 입력 시 프로필 사진 포함 선택 리스트 강제
+
+### EC-03. 저작권 침해 및 외부 리소스 부하
+- **Policy**: **직접 파일 업로드 금지**, YouTube/SoundCloud **임베드 방식만 허용**
+
+---
+
+## 4. 신뢰성 등급 (Trust Tier) 매트릭스
+
+| Tier | 표시 | 권한 | 검증 방식 |
+| --- | --- | --- | --- |
+| **Verified Pro** | 파란 체크 | 본인 프로필 전체 편집, 라인업 등록 | 학력/활동 증빙 + 관리자 승인 |
+| **Verified User** | 회색 체크 | 도슨트 노트 작성, 큐레이션 평가 | 이메일/실명 인증 |
+| **Unverified** | 표시 없음 | 조회만, 댓글 제한 | 가입만 완료 |
+| **Public Profile** | 'Unverified' 워터마크 | 시스템이 선등록한 뮤지션 | 본인 인계 시 Verified 전환 |
+
+---
+
+## 5. 우선순위 매트릭스 (MVP Scope)
+
+| 기능 | 우선순위 | 근거 |
+| --- | --- | --- |
+| 공연 정보 조회 | **P0** | 사용자 유입 핵심 동인 |
+| 뮤지션 프로필 + 관계도 | **P0** | 컨셉의 핵심 차별점 |
+| 도슨트 노트 | **P0** | "Insight" 가치 전달 |
+| 무드별 큐레이션 | **P1** | 입문자 진입 장벽 완화 |
+| 세션 매칭 | **P2** | 뮤지션 락인 효과 |
+| 결제/예매 | **P3** | 수익화는 트래픽 확보 후 |
+| 자유게시판 | **OUT** | 컨셉 분산 위험 |
+</script>
+
+<script type="text/plain" id="doc-02">
+# 02. Architecture — Hexagonal + DDD 설계 원칙
+
+> 이 문서는 DAZZ의 **모듈 구조**와 **계층 간 의존성 규칙**을 정의합니다.
+> 이 규칙은 모든 신규 코드에 예외 없이 적용됩니다.
+
+---
+
+## 1. 아키텍처 선택: Hexagonal Architecture (Ports & Adapters)
+
+### 1.1 왜 Hexagonal인가?
+
+DAZZ는 다음 특성을 가집니다:
+1. **다양한 입력 채널**: REST API, Kafka Consumer, Scheduler
+2. **다양한 외부 의존성**: MySQL, Redis, Kafka, S3, YouTube/SoundCloud, KakaoPay/Toss, Kakao/Naver Maps
+3. **장기적 컨셉 보호**: 도메인 로직이 인프라 변경(예: MySQL → PostgreSQL)에 영향받지 않아야 함
+
+→ **도메인을 인프라에서 격리**하는 Hexagonal이 최적.
+
+### 1.2 핵심 원칙
+
+> **"Domain은 Infrastructure를 모른다."**
+
+- Domain Layer는 **순수 POJO**로 유지
+- 외부 의존성은 **Port (interface)**로 추상화
+- 실제 구현은 **Adapter**가 담당 (DB, HTTP Client, Message Broker)
+
+---
+
+## 2. 패키지 구조 (Strict)
+
+```
+com.dazz.backend
+├── api/                          # Inbound Adapter (HTTP)
+│   ├── musician/
+│   │   ├── MusicianController.java
+│   │   ├── dto/
+│   │   └── mapper/
+│   └── common/
+│       ├── ApiResponse.java
+│       ├── ErrorResponse.java
+│       └── GlobalExceptionHandler.java
+│
+├── application/                  # Use Case Layer (Service)
+│   ├── musician/
+│   │   ├── MusicianQueryService.java
+│   │   ├── MusicianCommandService.java
+│   │   └── facade/
+│   │       └── CollaborationFacade.java
+│   └── port/
+│       ├── in/                   (Use Case 인터페이스, 선택)
+│       └── out/                  (Domain이 의존하는 Port)
+│           ├── MusicianRepository.java
+│           ├── CachePort.java
+│           ├── EventPublisherPort.java
+│           └── NotificationPort.java
+│
+├── domain/                       # Pure Domain (No Spring, No JPA)
+│   ├── musician/
+│   │   ├── Musician.java         (Aggregate Root, POJO)
+│   │   ├── Position.java         (Value Object, enum)
+│   │   ├── Collaboration.java
+│   │   └── exception/
+│   │       └── MusicianNotFoundException.java
+│   ├── album/
+│   ├── performance/
+│   └── shared/
+│       ├── BusinessException.java
+│       └── DomainEvent.java
+│
+└── infrastructure/               # Outbound Adapter
+    ├── persistence/
+    ├── cache/
+    ├── messaging/
+    └── external/
+```
+
+---
+
+## 3. 의존성 규칙 (절대 위반 금지)
+
+```
+api (Inbound Adapter)
+      │
+      ▼
+application (Use Case + Port 정의)
+      │             ▲
+      ▼             │ (Port 구현)
+domain (Pure)       │
+                    │
+           infrastructure (Outbound)
+
+화살표 방향이 유일한 의존 방향. 역방향 import 금지.
+```
+
+### 3.1 계층별 허용/금지
+
+| 계층 | 허용 import | 금지 import |
+| --- | --- | --- |
+| `domain` | java.*, 자기 패키지 | Spring, JPA, HTTP, Kafka SDK |
+| `application` | domain, application.port | api, infrastructure |
+| `api` | application, api.dto | domain (직접), infrastructure |
+| `infrastructure` | application.port, domain (mapper용) | api |
+
+> ⚠️ `api`가 `domain`을 직접 참조하지 않는 이유: Entity 노출 방지. 응답은 항상 DTO로.
+
+---
+
+## 4. Bounded Context (도메인 분리)
+
+| Context | 핵심 책임 | 주요 Aggregate Root |
+| --- | --- | --- |
+| **Musician Context** | 뮤지션 프로필, 협업 관계 | `Musician`, `Collaboration` |
+| **Archive Context** | 앨범, 참여 이력 | `Album`, `AlbumParticipation` |
+| **Performance Context** | 공연, 라인업, 공연장 | `Performance`, `Venue` |
+| **Curation Context** | 도슨트 노트, 큐레이션 | `DocentNote`, `Curation` |
+| **Identity Context** | 사용자, 인증, 권한 | `User`, `MusicianClaim` |
+| **Notification Context** | 알림 발송 | `Subscription`, `NotificationEvent` |
+
+> 컨텍스트 간 통신은 **Kafka 도메인 이벤트**로 처리. 직접 메서드 호출 금지.
+
+---
+
+## 5. Core Flow — 뮤지션 인사이트 조회 (Happy Path)
+
+```
+1. Client → GET /api/v1/musicians/{id}/insights?includeNetwork=true&depth=2
+2. MusicianController → MusicianQueryService.getInsight(id, depth)
+3. Service → CachePort.get("musician:insight:{id}:depth=2")
+   ├─ HIT  → DTO 매핑 후 즉시 반환 (목표: < 100ms)
+   └─ MISS → 다음 단계
+4. Service → MusicianRepository.findInsightById(id, depth)
+5. Service → CachePort.set(...) (TTL 10분)
+6. Service → API DTO 매핑
+7. Controller → 200 OK
+```
+
+---
+
+## 6. 트랜잭션 경계 규칙
+
+- **하나의 Use Case = 하나의 트랜잭션**: Service 메서드에 `@Transactional` 부착
+- **읽기 전용 조회**: `@Transactional(readOnly = true)` 명시
+- **락 + 트랜잭션 조합**: 반드시 **Facade 패턴**으로 락이 트랜잭션을 감싸도록
+- **외부 API 호출**: 트랜잭션 내에서 호출 금지 → 트랜잭션 커밋 후 이벤트 발행으로 분리
+</script>
+
+<script type="text/plain" id="doc-03">
+# 03. Tech Stack — 선정 근거와 트레이드오프
+
+> 이 문서는 각 기술 선택의 **방어 논리(Defense)**를 담습니다.
+
+---
+
+## 1. 전체 스택 한눈에
+
+| 영역 | 기술 | 버전 |
+| --- | --- | --- |
+| Language | **Java** | 17+ |
+| Framework | **Spring Boot** | 3.x |
+| ORM | **Spring Data JPA + Hibernate** | 3.x |
+| RDBMS | **MySQL** | 8.0 |
+| Cache / Lock | **Redis + Redisson** | 7.x / 3.x |
+| Message Broker | **Apache Kafka** | 3.x |
+| Resilience | **Resilience4j** | 2.x |
+| Container | **Docker + docker-compose** | latest |
+| CI/CD | **GitHub Actions** | - |
+| Test | **JUnit 5 + Mockito + Testcontainers** | latest |
+| Build | **Gradle (Kotlin DSL)** | 8.x |
+
+---
+
+## 2. Framework: Spring Boot 3.x
+
+**선정 이유**
+- Hexagonal + DDD 구현에 필요한 생태계 풍부
+- Java 17 LTS 기준 안정성
+- AOP 기반 트랜잭션/락/Circuit Breaker 데코레이터 합성에 최적
+
+---
+
+## 3. RDBMS: MySQL 8.0
+
+**선정 이유**
+- 뮤지션-앨범-협업 관계의 **참조 무결성**이 컨셉의 본질 → ACID 트랜잭션 필수
+- 명확한 스키마 + 복합 인덱스 + Window Function (8.0+) 활용
+
+**대안 검토**
+- PostgreSQL: JSONB 매력적이지만 MySQL 단순성/AWS RDS 운영 편의성 우선
+- MongoDB: 관계 그래프의 정합성 깨질 위험 → 컨셉에 부합하지 않음
+- Neo4j: 1인 프로젝트 운영 부담 + 그래프 연산은 Redis 캐시로 보완
+
+---
+
+## 4. Cache / Distributed Lock: Redis + Redisson
+
+**선정 이유**
+- NFR-02 (응답 0.5s) 달성을 위한 필수 계층
+- **Redisson Pub/Sub 기반 분산락**: Spin Lock 대비 CPU/네트워크 효율 우수
+- Redisson **Watchdog**: 좀비 락 방지 자동 연장
+
+**캐시 키 네이밍 컨벤션**
+```
+musician:insight:{musicianId}:depth={N}   (TTL 10분)
+musician:profile:{musicianId}             (TTL 1시간)
+collab:lock:{musicianAId}:{musicianBId}   (TTL 5초, 락 전용)
+idempotency:musician:{key}               (TTL 24시간)
+```
+
+---
+
+## 5. Messaging: Apache Kafka (가장 논쟁적인 선택)
+
+> **왜 RabbitMQ가 아닌 Kafka인가?**
+
+새 협업 등록이라는 단 하나의 이벤트가 다발적 후속 작업을 트리거한다:
+1. 네트워크 가중치 재계산
+2. Redis 캐시 무효화 및 재구축
+3. 구독자 알림 발송
+4. 통계/분석용 데이터 적재
+
+| 항목 | RabbitMQ | **Kafka** |
+| --- | --- | --- |
+| 메시지 영속성 | 소비 시 삭제 | **디스크 로그로 보존** |
+| 재처리(Replay) | 불가 | **가능 (offset 조정)** |
+| Fan-out | Exchange 설정 필요 | **Consumer Group으로 자연스럽게** |
+| 처리량 | 중간 | **매우 높음** |
+
+**토픽 설계 원칙**
+```
+collaboration.created.v1         # 새 협업 등록
+collaboration.weight.recalc.v1   # 가중치 재계산 요청
+cache.invalidate.v1              # 캐시 무효화 신호
+notification.dispatch.v1         # 알림 발송 요청
+```
+
+---
+
+## 6. Resilience: Resilience4j 2.x
+
+- Spring Cloud Circuit Breaker의 기본 백엔드
+- AOP 기반 데코레이터 합성 (`@Retry`, `@CircuitBreaker`, `@TimeLimiter`, `@Bulkhead`)
+- Hystrix 후계자
+
+---
+
+## 7. Infra & CI/CD: Docker + GitHub Actions
+
+```
+infra/
+├── docker/
+│   ├── Dockerfile.app
+│   └── docker-compose.yml    (app + mysql + redis + kafka)
+└── .github/
+    └── workflows/
+        ├── ci.yml            (PR 시 테스트 + 빌드)
+        └── cd.yml            (main 머지 시 배포)
+```
+
+---
+
+## 8. Git Strategy: GitHub Flow
+
+- `main`: 배포 가능한 상태만 유지. 직접 push 금지
+- `feature/{이슈번호}-{짧은설명}`: 모든 작업은 feature 브랜치에서
+- PR Gate: 자동 테스트 통과 + Self-review 필수
+
+---
+
+## 9. 테스트 스택
+
+| 종류 | 도구 | 용도 |
+| --- | --- | --- |
+| Unit Test | JUnit 5 + Mockito + AssertJ | 도메인 로직, Service |
+| Integration Test | Spring Boot Test + **Testcontainers** | DB/Kafka/Redis 실제 컨테이너 |
+| API Test | RestAssured / MockMvc | Controller 계층 |
+</script>
+
+<script type="text/plain" id="doc-04">
+# 04. Schema — Data Model & ERD
+
+> 이 문서는 DAZZ의 **데이터 구조**와 그 **설계 근거**를 정의합니다.
+
+---
+
+## 1. 핵심 엔티티 한눈에
+
+```
+USER ──(1:1 Optional)── MUSICIAN ──┬── (1:N) ── COLLABORATION (self-ref)
+                                   ├── (M:N via ALBUM_PARTICIPATION) ── ALBUM
+                                   └── (M:N via PERFORMANCE_LINEUP) ── PERFORMANCE
+                                                                       └─ (N:1) VENUE
+DOCENT_NOTE ──(N:1)── MUSICIAN
+SUBSCRIPTION ──(M:N)── USER × MUSICIAN
+```
+
+---
+
+## 2. 핵심 테이블 명세
+
+### 2.1 `MUSICIAN` (뮤지션 — Aggregate Root)
+
+| 컬럼 | 타입 | 제약 | 설명 |
+| --- | --- | --- | --- |
+| `id` | BIGINT PK | AUTO_INCREMENT | 내부 식별자 |
+| `uuid` | CHAR(36) | UNIQUE NOT NULL | **동명이인 방지용 외부 식별자** |
+| `user_id` | BIGINT FK | UNIQUE, NULLABLE | USER 1:1 Optional |
+| `stage_name` | VARCHAR(100) | NOT NULL | 활동명 |
+| `real_name` | VARCHAR(100) | NULLABLE | 본명 (선택 공개) |
+| `primary_position` | VARCHAR(30) | NOT NULL | Vocal/Piano/Bass... |
+| `birth_year` | SMALLINT | NULLABLE | 동명이인 구분용 |
+| `bio` | TEXT | NULLABLE | 본인 작성 소개 |
+| `profile_image_url` | VARCHAR(500) | NULLABLE | S3 URL |
+| `verification_tier` | VARCHAR(20) | NOT NULL DEFAULT 'UNVERIFIED' | 신뢰등급 |
+| `created_at`, `updated_at` | DATETIME | NOT NULL | 감사 |
+
+**핵심 설계 결정**:
+- `user_id`의 `UNIQUE + NULLABLE`: 시스템이 먼저 뮤지션 정보를 등록(Nullable)하고, 본인이 나타나 연결 가능
+- `uuid`: 협업 데이터 입력 시 동명이인 오염 방지의 핵심
+
+### 2.2 `USER` (서비스 사용자)
+
+| 컬럼 | 타입 | 제약 | 설명 |
+| --- | --- | --- | --- |
+| `id` | BIGINT PK | AUTO_INCREMENT | |
+| `email` | VARCHAR(255) | UNIQUE NOT NULL | 로그인 식별자 |
+| `password_hash` | VARCHAR(255) | NOT NULL | BCrypt |
+| `display_name` | VARCHAR(100) | NOT NULL | |
+| `role` | VARCHAR(20) | NOT NULL DEFAULT 'USER' | USER / ADMIN |
+| `email_verified_at` | DATETIME | NULLABLE | |
+
+### 2.3 `ALBUM` (앨범)
+
+| 컬럼 | 타입 | 설명 |
+| --- | --- | --- |
+| `id` | BIGINT PK | |
+| `title` | VARCHAR(255) | |
+| `release_date` | DATE | |
+| `cover_image_url` | VARCHAR(500) | |
+| `genre_primary` | VARCHAR(50) | |
+
+> ⚠️ `ALBUM`에 **`leader_id` 컬럼을 두지 않는다**. 모든 참여 관계는 `ALBUM_PARTICIPATION`을 거친다.
+
+### 2.4 `ALBUM_PARTICIPATION` (앨범 참여 — 핵심 N:M 관계)
+
+| 컬럼 | 타입 | 제약 | 설명 |
+| --- | --- | --- | --- |
+| `id` | BIGINT PK | | |
+| `album_id` | BIGINT FK | NOT NULL | 고아 데이터 방지 |
+| `musician_id` | BIGINT FK | NOT NULL | 고아 데이터 방지 |
+| `participation_type` | VARCHAR(30) | NOT NULL | LEADER / SIDEMAN / FEATURING / PRODUCER |
+| `instrument` | VARCHAR(30) | NULLABLE | 연주 악기 |
+
+**인덱스**:
+- `(musician_id, participation_type)` — Sideman 이력 조회 핵심
+- `(album_id)` — 앨범 참여진 조회
+- UNIQUE: `(album_id, musician_id, participation_type, instrument)`
+
+### 2.5 `COLLABORATION` (협업 관계 — Self-referencing)
+
+| 컬럼 | 타입 | 제약 | 설명 |
+| --- | --- | --- | --- |
+| `id` | BIGINT PK | | |
+| `from_musician_id` | BIGINT FK | NOT NULL | |
+| `to_musician_id` | BIGINT FK | NOT NULL | |
+| `relation_type` | VARCHAR(30) | NOT NULL | COLLABORATION / MENTOR / BAND_MEMBER |
+| `weight` | INT | NOT NULL DEFAULT 1 | 협업 횟수 (동시성 제어 대상) |
+| `last_collaborated_at` | DATETIME | NULLABLE | |
+
+**제약**: `from_musician_id < to_musician_id` (대칭 관계 중복 저장 방지)
+
+### 2.6 `PERFORMANCE` & `PERFORMANCE_LINEUP`
+
+```
+PERFORMANCE
+  - id, venue_id (FK NOT NULL), performance_datetime, title, ticket_price
+  - genre_primary, description
+
+PERFORMANCE_LINEUP
+  - id, performance_id (FK NOT NULL), musician_id (FK NOT NULL)
+  - role (LEADER / SIDEMAN), instrument
+  - UNIQUE(performance_id, musician_id, role)
+```
+
+### 2.7 `VENUE` (공연장)
+
+```
+VENUE
+  - id, name, address, latitude, longitude
+  - operating_hours, has_jam_session (bool)
+  - phone, sns_url
+```
+
+### 2.8 `DOCENT_NOTE` (도슨트 노트)
+
+| 컬럼 | 타입 | 설명 |
+| --- | --- | --- |
+| `musician_id` | BIGINT FK | 대상 뮤지션 |
+| `style_tags` | JSON | ["#비밥", "#서정적"] |
+| `summary` | TEXT | 한 줄 요약 |
+| `content` | TEXT | 본문 |
+| `author_id` | BIGINT FK | 작성자 USER |
+
+---
+
+## 3. 인덱스 전략
+
+| 테이블 | 인덱스 | 목적 |
+| --- | --- | --- |
+| `ALBUM_PARTICIPATION` | `(musician_id, participation_type)` | Sideman 이력 조회 |
+| `COLLABORATION` | `(from_musician_id, weight DESC)` | 가중치 높은 협업 순 |
+| `PERFORMANCE` | `(performance_datetime, venue_id)` | 공연 일정 조회 |
+| `MUSICIAN` | `(uuid)` UNIQUE | 외부 식별자 조회 |
+| `MUSICIAN` | `(stage_name)` | 이름 검색 |
+
+---
+
+## 4. 마이그레이션 도구
+
+- **Flyway** 사용
+- 파일명: `V{YYYYMMDDHHmm}__{설명}.sql`
+- 마이그레이션은 **절대 수정하지 않음**: 잘못된 경우 새 마이그레이션으로 롤백
+</script>
+
+<script type="text/plain" id="doc-05">
+# 05. API Specification
+
+> 모든 API는 본 문서의 **공통 응답 포맷**과 **에러 처리 규약**을 준수합니다.
+
+---
+
+## 1. 공통 규약
+
+### 1.1 Base URL
+```
+Local      : http://localhost:8080
+Production : https://api.dazz.kr
+```
+
+### 1.2 인증
+- **JWT Bearer Token** (`Authorization: Bearer {token}`)
+- Access 30분 / Refresh 14일
+
+### 1.3 공통 응답 포맷
+
+**성공 응답**
+```json
+{
+  "success": true,
+  "data": { ... },
+  "meta": {
+    "timestamp": "2026-05-17T00:00:00Z",
+    "requestId": "uuid-v4"
+  }
+}
+```
+
+**에러 응답**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "MUSICIAN_NOT_FOUND",
+    "message": "해당 뮤지션을 찾을 수 없습니다.",
+    "details": { "musicianId": 102 }
+  },
+  "meta": { "timestamp": "...", "requestId": "..." }
+}
+```
+
+### 1.4 HTTP 상태 코드 정책
+
+| 상황 | 코드 |
+| --- | --- |
+| 성공 (단순 조회) | 200 |
+| 생성 성공 | 201 |
+| 비동기 접수 | 202 |
+| 부분 응답 + Fallback | **200** (5xx 금지) |
+| 검증 실패 | 400 |
+| 인증 실패 | 401 |
+| 권한 없음 | 403 |
+| 리소스 없음 | 404 |
+| 중복 (멱등성 충돌) | 409 |
+| 비즈니스 규칙 위반 | 422 |
+| 서버 오류 | 500 |
+
+---
+
+## 2. 표준 에러 코드
+
+| Code | HTTP | 의미 |
+| --- | --- | --- |
+| `VALIDATION_FAILED` | 400 | 요청 파라미터 검증 실패 |
+| `UNAUTHORIZED` | 401 | 토큰 없음/만료 |
+| `FORBIDDEN` | 403 | 권한 없음 |
+| `MUSICIAN_NOT_FOUND` | 404 | 뮤지션 없음 |
+| `DUPLICATE_COLLABORATION` | 409 | 중복 협업 등록 |
+| `UNVERIFIED_MUSICIAN` | 422 | 미인증 뮤지션의 편집 시도 |
+| `INTERNAL_SERVER_ERROR` | 500 | 알 수 없는 서버 오류 |
+
+---
+
+## 3. 엔드포인트 카탈로그 (MVP)
+
+### 3.1 Auth (인증)
+
+**`POST /auth/login`**
+```json
+// 요청
+{ "email": "user@example.com", "password": "..." }
+// 응답 200
+{ "success": true, "data": { "accessToken": "...", "refreshToken": "...", "expiresIn": 1800 } }
+```
+
+**`POST /auth/refresh`** — 헤더: `Authorization: Bearer {refreshToken}`
+
+**`POST /auth/signup`** — 이메일 인증 메일 발송
+
+---
+
+### 3.2 Exploration — 핵심 API
+
+**`GET /api/v1/musicians/{musicianId}/insights`**
+
+> 프로필 + 도슨트 노트 + 협업 네트워크를 한 번에 조회. 서비스의 핵심 기능.
+
+| 파라미터 | 타입 | 기본값 | 설명 |
+| --- | --- | --- | --- |
+| `includeNetwork` | boolean | true | 협업 네트워크 포함 여부 |
+| `depth` | int (1~3) | 1 | 네트워크 탐색 깊이 |
+
+**성능 목표**: p99 < 500ms | **캐시 키**: `musician:insight:{id}:depth={N}` TTL 10분
+
+---
+
+### 3.3 Identity (뮤지션 프로필)
+
+- `GET /api/v1/musicians/{musicianId}` — 기본 프로필 조회
+- `PATCH /api/v1/musicians/{musicianId}` — 본인만 가능 (Verified 이상)
+- `POST /api/v1/musicians/{musicianId}/claim` — 본인 인증 요청
+
+---
+
+### 3.4 Archive (아카이빙)
+
+- `GET /api/v1/search?q=&type=musician|album|performance`
+- `GET /api/v1/musicians/{musicianId}/sideman-history` — Sideman 참여 이력
+- `GET /api/v1/albums/{albumId}/participations` — 앨범 참여진
+
+---
+
+### 3.5 Collaboration (협업 — 쓰기 API)
+
+**`POST /api/v1/collaborations`**
+- 헤더: `Idempotency-Key: {uuid}` **필수**
+- 인증: Verified Pro 필수
+```json
+{
+  "fromMusicianUuid": "...",
+  "toMusicianUuid": "...",
+  "relationType": "COLLABORATION",
+  "albumId": 451,
+  "performedAt": "2026-04-12"
+}
+```
+응답: **202 Accepted**
+
+---
+
+### 3.6 Performance (공연)
+
+- `GET /api/v1/performances?from=&to=&venueId=&musicianId=`
+- `POST /api/v1/performances` — 공연장 운영자 또는 Verified Pro
+
+---
+
+## 4. 페이지네이션 규약
+
+```
+GET /api/v1/...?page=0&size=20&sort=createdAt,desc
+```
+
+```json
+{
+  "data": {
+    "content": [ ... ],
+    "page": { "number": 0, "size": 20, "totalElements": 142, "totalPages": 8 }
+  }
+}
+```
+</script>
+
+<script type="text/plain" id="doc-06">
+# 06. Coding Conventions & Anti-Patterns
+
+> 이 문서는 코드 품질의 **최소 기준선**입니다.
+> 여기 명시된 규칙을 위반하는 PR은 머지되지 않습니다.
+
+---
+
+## 1. 네이밍 컨벤션
+
+| 대상 | 규칙 | 예시 |
+| --- | --- | --- |
+| 클래스 | PascalCase | `MusicianQueryService` |
+| 메서드/변수 | camelCase | `findInsightById` |
+| 상수 | UPPER_SNAKE_CASE | `MAX_NETWORK_DEPTH` |
+| 패키지 | lowercase | `com.dazz.application.musician` |
+
+**도메인 용어 일관성**
+
+| 한국어 | 영문 표기 | 금지 표기 |
+| --- | --- | --- |
+| 도슨트 노트 | `DocentNote` | `Description`, `Comment` |
+| 협업 가중치 | `collaborationWeight` | `relationStrength` |
+| 인사이트 | `Insight` | `Detail`, `Summary` |
+| 라인업 | `Lineup` | `Members`, `Cast` |
+
+**메서드명 패턴**
+
+| 의도 | 접두어 |
+| --- | --- |
+| 단건 조회 (없으면 예외) | `get` |
+| 단건 조회 (Optional) | `find` |
+| 다건 조회 | `findAll`, `search` |
+| 생성 | `create` |
+| 수정 | `update` |
+
+---
+
+## 2. 의존성 주입 (DI)
+
+✅ **DO — 생성자 주입 (Lombok @RequiredArgsConstructor)**
+```java
+@Service
+@RequiredArgsConstructor
+public class MusicianQueryService {
+    private final MusicianRepository musicianRepository;
+    private final CachePort cachePort;
+}
+```
+
+❌ **DON'T — 필드 주입**
+```java
+@Autowired
+private MusicianRepository musicianRepository;  // 금지
+```
+
+---
+
+## 3. DTO 규칙
+
+**record 타입 적극 활용 (Java 17+)**
+```java
+public record MusicianInsightResponse(
+    Long musicianId,
+    String uuid,
+    ProfileDto profile,
+    List<NetworkNodeDto> network
+) {
+    public static MusicianInsightResponse from(MusicianInsight domain) {
+        return new MusicianInsightResponse(/* ... */);
+    }
+}
+```
+
+- Entity를 Controller에서 직접 반환 금지
+- Entity에 `@Data` 사용 절대 금지 (Setter 노출 + 양방향 참조 무한루프 위험)
+
+---
+
+## 4. 예외 처리
+
+❌ **절대 금지**
+```java
+throw new RuntimeException("Musician not found");
+```
+
+✅ **커스텀 예외 계층 사용**
+```java
+// domain/shared/BusinessException.java
+public abstract class BusinessException extends RuntimeException {
+    private final ErrorCode errorCode;
+    protected BusinessException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+}
+
+// domain/musician/exception/MusicianNotFoundException.java
+public class MusicianNotFoundException extends BusinessException {
+    public MusicianNotFoundException(Long musicianId) {
+        super(ErrorCode.MUSICIAN_NOT_FOUND, "뮤지션을 찾을 수 없습니다: " + musicianId);
+    }
+}
+```
+
+---
+
+## 5. JPA 사용 규칙
+
+**N+1 문제 방어**
+```java
+// ❌ N+1 발생
+musicians.forEach(m -> m.getCollaborations().size());
+
+// ✅ Fetch Join
+@Query("SELECT m FROM Musician m LEFT JOIN FETCH m.collaborations WHERE m.id = :id")
+Optional<Musician> findByIdWithCollaborations(@Param("id") Long id);
+```
+
+---
+
+## 6. 테스트 컨벤션 (BDD)
+
+```java
+@Test
+@DisplayName("[성공] 존재하는 뮤지션 ID로 인사이트를 조회한다")
+void getInsight_success() {
+    // Given
+    Long musicianId = 102L;
+    when(repository.findById(musicianId)).thenReturn(Optional.of(given));
+
+    // When
+    MusicianInsight result = service.getInsight(musicianId, 1, true);
+
+    // Then
+    assertThat(result.getId()).isEqualTo(musicianId);
+}
+```
+
+**필수 테스트 케이스**: 성공(Happy Path) + **예외(Unhappy Path) 최소 1개**
+
+---
+
+## 7. AI가 자주 저지르는 실수 10가지
+
+1. Entity의 `@Data` 사용
+2. `throw new RuntimeException()`
+3. 트랜잭션 안에서 외부 API 호출
+4. 락 안에서 트랜잭션 시작
+5. `Optional` 반환 후 `.get()`
+6. `@Transactional` 없는 Service에서 Lazy 컬렉션 접근
+7. N+1을 무시한 `findAll().forEach(m -> m.getX())`
+8. DTO 매핑을 Controller가 직접 수행
+9. 양방향 연관관계 자동 추가
+10. 도메인 객체에 `@Component` 등 Spring 어노테이션
+
+---
+
+## 8. 셀프 코드리뷰 체크리스트
+
+- [ ] 메서드 길이 20라인 이하?
+- [ ] 생성자 주입 사용?
+- [ ] Entity 직접 노출 없음?
+- [ ] 커스텀 예외 사용?
+- [ ] BDD 테스트 + Unhappy Path 포함?
+- [ ] N+1 의심 코드 없음?
+- [ ] 트랜잭션 경계 명확함?
+</script>
+
+<script type="text/plain" id="doc-07">
+# 07. Concurrency Control — 분산락, 멱등성, 동시성 방어
+
+> 본 문서는 **'협업 가중치 업데이트'**를 중심으로 동시성 문제를 다룹니다.
+
+---
+
+## 1. 문제 원인 분석
+
+### 1.1 `count++`는 원자적이지 않다
+
+CPU 관점에서 `weight++`은 **Read-Modify-Write 3단계**:
+```
+1. 메모리에서 weight 값을 읽음   (Read)
+2. +1 연산                       (Modify)
+3. 메모리에 다시 씀              (Write)
+```
+
+두 스레드가 거의 동시에 동일한 값을 읽으면, 나중에 쓰는 스레드가 먼저 쓴 결과를 **덮어쓰는 Lost Update** 발생.
+
+### 1.2 MySQL Repeatable Read만으로는 부족
+
+1. 트랜잭션 A가 weight를 조회 (RR Snapshot)
+2. 트랜잭션 B가 동일 행을 조회하고 +1 커밋
+3. 트랜잭션 A는 여전히 이전 값으로 연산
+4. 트랜잭션 A의 UPDATE가 B의 결과를 덮어씀
+
+> **결론**: 격리수준만으로는 안 된다. **명시적 Locking 메커니즘이 필수**.
+
+---
+
+## 2. 분산락 전략 (Redisson Pub/Sub)
+
+| 구분 | Lettuce (Spin Lock) | **Redisson (Pub/Sub)** |
+| --- | --- | --- |
+| 대기 방식 | SETNX 반복 호출 | 락 해제 시 Redis가 신호 발송 |
+| CPU 부하 | 높음 | 낮음 |
+
+**TTL 산출**
+```
+TTL = Max(Latency) × Margin(10) = 0.5s × 10 = 5초
+```
+
+**Watchdog 자동 연장**: 비즈니스 로직이 예상보다 길어질 경우 락 수명 자동 연장
+
+---
+
+## 3. AOP Trap 방어 — Facade 아키텍처
+
+### 잘못된 구조 (❌)
+```java
+@Transactional
+public void updateWeight(...) {
+    redissonLock.lock();     // 트랜잭션 안에서 락 → 깨진다
+    try { ... }
+    finally { redissonLock.unlock(); }
+}
+```
+
+**왜 깨지는가?**: 락 해제 → 트랜잭션 커밋 사이에 다른 스레드가 진입 가능
+
+### 올바른 구조 — Facade 패턴 (✅)
+```java
+@Component
+@RequiredArgsConstructor
+public class CollaborationFacade {
+    private final RedissonClient redissonClient;
+    private final CollaborationService collaborationService;
+
+    public CollaborationResult updateWeight(Long aId, Long bId) {
+        RLock lock = redissonClient.getLock(lockKey(aId, bId));
+        try {
+            if (!lock.tryLock(2, 5, TimeUnit.SECONDS)) {
+                throw new ConcurrentUpdateException();
+            }
+            // 트랜잭션이 락 내부에서 시작/커밋
+            return collaborationService.updateWeightTransactional(aId, bId);
+        } finally {
+            if (lock.isHeldByCurrentThread()) lock.unlock();
+        }
+    }
+}
+
+@Service
+public class CollaborationService {
+    @Transactional   // 락이 잡혀있는 상태에서 안전하게 실행
+    public CollaborationResult updateWeightTransactional(Long aId, Long bId) {
+        // Read-Modify-Write
+    }
+}
+```
+
+> **핵심 원칙**: 락의 범위 > 트랜잭션의 범위
+
+---
+
+## 4. Retry 전략 — Backoff & Jitter
+
+**Fixed Backoff의 문제**: 1000개 클라이언트가 동시에 실패 → 1초 후 동시에 재시도 → 서버 다시 다운
+
+**Exponential Backoff + Full Jitter**: 재시도 시점이 무작위로 분산
+
+| 파라미터 | 값 | 근거 |
+| --- | --- | --- |
+| `maxAttempts` | 3 | 첫 시도 + 재시도 2회 |
+| `baseDelay` | 1000ms | transient 장애 회복 대기 |
+| `backoffMultiplier` | 2 | 1s → 2s → 4s |
+| `jitter` | Full Jitter | AWS 공식 권장 |
+| `maxDelay` | 8000ms | 무한 증가 방지 |
+
+---
+
+## 5. 멱등성 (Idempotency) 보장
+
+**문제**: 네트워크 타임아웃으로 버튼을 여러 번 누름 → 협업이 중복 등록되어 weight 부풀려짐
+
+**해결**: `Idempotency-Key` 헤더
+```
+POST /api/v1/collaborations
+Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000
+```
+
+**처리 흐름**:
+```
+1. Redis에서 key 조회
+   ├─ HIT  → 캐시된 응답 그대로 반환
+   └─ MISS → 비즈니스 로직 실행
+2. 응답 결과를 Redis에 저장 (TTL 24h)
+```
+
+---
+
+## 6. 통합 시나리오 — 새 협업 등록 흐름
+
+```
+[1] Client → POST /api/v1/collaborations (Idempotency-Key 포함)
+[2] Controller → idempotencyService.checkOrAcquire(key, payload)
+    ├─ HIT  → 캐시된 응답 즉시 반환
+    └─ MISS → 진행
+[3] CollaborationFacade.updateWeight()
+    ├─ Redisson Lock 획득 (TTL 5s + Watchdog)
+    ├─ @Transactional 시작
+    │   ├─ COLLABORATION 조회 또는 INSERT
+    │   ├─ weight 증가
+    │   ├─ Outbox 이벤트 적재
+    │   └─ 트랜잭션 커밋
+    └─ Lock 해제
+[4] Outbox Poller → Kafka 발행
+[5] 병렬 Consumer: 가중치 재계산 / 캐시 무효화 / 알림 발송
+[6] Controller → 202 Accepted
+```
+
+---
+
+## 7. 안티 패턴 (절대 하지 말 것)
+
+- ❌ `synchronized` 키워드만으로 동시성 제어 (Scale-out 환경에서 무력)
+- ❌ Application 메모리 기반 락 (`ReentrantLock` 등)
+- ❌ DB 비관적 락을 광범위하게 사용 — 데드락 + 성능 저하
+- ❌ 트랜잭션 내부에 락 코드 작성
+- ❌ TTL 없는 Redis 락 (좀비 락)
+- ❌ Idempotency-Key 없이 결제/등록 API 노출
+</script>
+
+<script type="text/plain" id="doc-08">
+# 08. Fault Tolerance — 장애 대응 및 회복 전략
+
+> 외부 API 의존성 장애가 DAZZ 서비스 전반으로 **전파**되는 것을 차단하기 위한 전략.
+
+---
+
+## 1. 핵심 원칙: 컨셉을 지키는 Graceful Degradation
+
+> **"시스템이 망가졌을 때조차 'K-Jazz Insight Navigator'의 컨셉을 지킨다."**
+
+- HTTP 상태 코드는 가급적 **200을 유지**
+- Degradation은 응답 본문의 `meta`로 신호
+- **200 + 부분 데이터**: 프론트엔드가 "있는 것은 그리고, 없는 것은 placeholder"로 렌더링 가능
+
+---
+
+## 2. 외부 API 지연이 DAZZ를 죽이는 메커니즘
+
+Tomcat은 기본 200개 워커 스레드. 외부 API 응답 대기 중 스레드는 `BLOCKED` 상태.
+
+**시나리오** (YouTube API가 100ms → 5초 지연):
+- Phase 1: 정상 50 req/s, 5개 스레드만 사용
+- Phase 2: 5초 시점에 250개 필요 (풀은 200개)
+- Phase 3: 큐(100개) 포화
+- Phase 4: TCP 연결 거절 → 503
+
+> **방어의 본질**: 외부 서버를 빠르게 만드는 게 아니라,
+> **내 스레드가 너무 오래 외부 응답을 기다리지 않도록 강제하는 것**.
+
+---
+
+## 3. 외부 API별 Timeout 설정
+
+| API | Connect | Read | 근거 |
+| --- | --- | --- | --- |
+| YouTube/SoundCloud | 1s | 3s | 글로벌 CDN |
+| Kakao/Naver Maps | 1s | 2s | 국내 API |
+| KakaoPay/Toss PG | 2s | 5s | 금융 처리, 카드사 인증 시간 |
+
+---
+
+## 4. Circuit Breaker 설정
+
+### `embedApiCB` — YouTube/SoundCloud (영향도 낮음)
+```yaml
+slidingWindowSize: 10
+minimumNumberOfCalls: 5
+failureRateThreshold: 50
+waitDurationInOpenState: 30s
+```
+
+### `mapsApiCB` — Kakao/Naver Maps (영향도 중간)
+```yaml
+slidingWindowSize: 10
+failureRateThreshold: 50
+waitDurationInOpenState: 15s
+```
+
+### `paymentPgCB` — KakaoPay/Toss (영향도 매우 높음)
+```yaml
+slidingWindowSize: 5
+minimumNumberOfCalls: 3
+failureRateThreshold: 40     # 보수적: 5건 중 2건 실패 시 즉시 차단
+waitDurationInOpenState: 60s
+permittedNumberOfCallsInHalfOpenState: 1  # 결제 탐색은 단 1건만
+```
+
+---
+
+## 5. 데코레이터 합성 순서
+
+```
+요청 ──► @Retry ──► @CircuitBreaker ──► @TimeLimiter ──► 외부 API
+```
+
+- TimeLimiter가 가장 안쪽: slow call로 분류되어야 서킷이 트립됨
+- CircuitBreaker가 중간: TimeLimiter 실패를 카운트
+- Retry가 바깥: 서킷이 닫혀 있을 때만 재시도 의미 있음
+
+```java
+@Retry(name = "externalApiRetry")
+@CircuitBreaker(name = "embedApiCB", fallbackMethod = "embedFallback")
+@TimeLimiter(name = "embedApiCB")
+public CompletableFuture<EmbedResponse> fetchEmbed(String videoUrl) {
+    return CompletableFuture.supplyAsync(() -> youtubeClient.getEmbed(videoUrl));
+}
+```
+
+---
+
+## 6. 3단계 Fallback 전략
+
+### Level 1 (Best Effort) — 캐시된 응답으로 우회
+- 서킷이 Open되면 Redis에서 직전 성공 응답을 꺼내 반환
+- 응답: `200 OK + meta.isStale=true`
+- UX: "5분 전 데이터 기준입니다" (정보톤, 알람톤 아님)
+
+### Level 2 (Reduced Function) — network 필드만 비활성화
+- 관계도 그래프 서킷이 Open되면 `network: []` 반환
+- profile과 docentNote는 정상 작동
+- UX: "관계도는 잠시 후 표시됩니다 · 프로필과 도슨트 노트는 정상이에요"
+- 응답: `200 OK + meta.degradation=L2_REDUCED`
+
+### Level 3 (Minimal) — 큐레이션으로 우회 안내
+- docent와 network 양쪽 서킷이 모두 Open
+- 응답에 `recommendation` 필드 추가 (비슷한 장르 뮤지션 추천)
+- UX: 도슨트 노트 자리에 큐레이션 카드 + "다른 아티스트 둘러보기"
+
+> **"에러가 발생했습니다"는 사용자를 막다른 길에 세우고,**
+> **큐레이션은 사용자를 다음 골목으로 안내한다.**
+
+---
+
+## 7. Bulkhead — 자원 격리
+
+```yaml
+resilience4j:
+  bulkhead:
+    instances:
+      archiveSearchBulkhead:
+        maxConcurrentCalls: 20    # 무거운 검색이 전체 스레드 잠식 방지
+      musicianInsightBulkhead:
+        maxConcurrentCalls: 50    # 핵심 기능 보호
+```
+
+---
+
+## 8. 검증 시나리오 (Chaos Engineering)
+
+| 시나리오 | 기대 동작 |
+| --- | --- |
+| YouTube API 5초 지연 | embedApiCB Open → fallback 응답 |
+| KakaoPay 30% 500 에러 | paymentPgCB Open → pending 저장 |
+| Redis 다운 | 캐시 미스 → DB 직접 조회, 서비스 지속 |
+| MySQL 다운 | 캐시 응답으로 우회 (L1), 새 쓰기는 503 |
+</script>
+
+<!-- ════════════════════════════════════════════
+     JavaScript
+     ════════════════════════════════════════════ -->
+<script>
+  const titles = {
+    '00': '00 · Overview — 프로젝트 컨셉 & 비전',
+    '01': '01 · Requirements — 기능 요구사항 & NFR',
+    '02': '02 · Architecture — 헥사고날 & DDD 원칙',
+    '03': '03 · Tech Stack — 기술 선정 & 트레이드오프',
+    '04': '04 · Schema — ERD & 데이터 모델',
+    '05': '05 · API Spec — 엔드포인트 명세',
+    '06': '06 · Conventions — 코딩 컨벤션 & 안티패턴',
+    '07': '07 · Concurrency — 분산락 & 멱등성',
+    '08': '08 · Fault Tolerance — 서킷브레이커 & 폴백',
+  };
+
+  marked.setOptions({
+    highlight: function(code, lang) {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(code, { language: lang }).value;
+      }
+      return hljs.highlightAuto(code).value;
+    },
+    breaks: false,
+    gfm: true,
+  });
+
+  function loadDoc(el) {
+    const id = el.dataset.doc;
+    const scriptEl = document.getElementById('doc-' + id);
+    if (!scriptEl) return;
+
+    // 사이드바 활성화
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+
+    // 상단 타이틀
+    document.getElementById('topbar-title').textContent = titles[id] || '';
+
+    // 마크다운 렌더링
+    const md = scriptEl.textContent;
+    document.getElementById('markdown-body').innerHTML = marked.parse(md);
+    document.getElementById('content').scrollTop = 0;
+
+    // 코드 하이라이팅 (marked가 처리 못한 것)
+    document.querySelectorAll('#markdown-body pre code').forEach(el => {
+      hljs.highlightElement(el);
+    });
+  }
+
+  // 초기 로드
+  window.addEventListener('DOMContentLoaded', () => {
+    const first = document.querySelector('.nav-item[data-doc="00"]');
+    loadDoc(first);
+  });
+</script>
+
+</body>
+</html>
