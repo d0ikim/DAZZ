@@ -19,15 +19,27 @@
       color: #1a1a2e;
     }
 
+    /* ─── Overlay (모바일 사이드바 열렸을 때 배경) ─── */
+    #overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10;
+    }
+    #overlay.show { display: block; }
+
     /* ─── Sidebar ─── */
     #sidebar {
-      width: 240px;
-      min-width: 240px;
+      width: 260px;
+      min-width: 260px;
       background: #12121f;
       color: #d4d4d4;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      transition: transform 0.25s ease;
+      z-index: 20;
     }
 
     .logo {
@@ -53,10 +65,10 @@
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      padding: 10px 20px;
+      padding: 12px 20px;
       text-decoration: none;
       color: #9090a8;
-      font-size: 13px;
+      font-size: 14px;
       line-height: 1.5;
       transition: background 0.15s, color 0.15s;
       cursor: pointer;
@@ -72,11 +84,11 @@
       font-size: 10px;
       color: #444460;
       min-width: 18px;
-      margin-top: 2px;
+      margin-top: 3px;
       font-family: monospace;
     }
     .nav-item.active .nav-num { color: #a07830; }
-    .nav-label { line-height: 1.4; }
+    .nav-label { line-height: 1.5; }
 
     /* ─── Main ─── */
     #main {
@@ -84,19 +96,67 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      min-width: 0;
     }
 
     #topbar {
       background: #fff;
       border-bottom: 1px solid #e0e0e0;
-      padding: 14px 32px;
+      padding: 14px 20px;
       font-size: 13px;
       color: #888;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-shrink: 0;
     }
     #topbar strong { color: #1a1a2e; font-size: 14px; }
+
+    /* ─── 햄버거 버튼 ─── */
+    #hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    #hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #1a1a2e;
+      border-radius: 2px;
+      transition: all 0.25s;
+    }
+
+    /* ─── 모바일 ─── */
+    @media (max-width: 700px) {
+      #sidebar {
+        position: fixed;
+        top: 0; left: 0; bottom: 0;
+        transform: translateX(-100%);
+        width: 280px;
+        min-width: unset;
+      }
+      #sidebar.open { transform: translateX(0); }
+
+      #hamburger { display: flex; }
+
+      #topbar { padding: 13px 16px; }
+
+      #topbar-title { font-size: 13px; }
+
+      #content { padding: 24px 16px 60px; }
+
+      #markdown-body h1 { font-size: 22px; }
+      #markdown-body h2 { font-size: 17px; }
+      #markdown-body h3 { font-size: 15px; }
+      #markdown-body pre { padding: 12px 14px; font-size: 12px; }
+      #markdown-body table { font-size: 13px; display: block; overflow-x: auto; }
+      #markdown-body th, #markdown-body td { padding: 8px 10px; white-space: nowrap; }
+    }
 
     #content {
       flex: 1;
@@ -225,6 +285,8 @@
 </head>
 <body>
 
+<div id="overlay" onclick="closeSidebar()"></div>
+
 <aside id="sidebar">
   <div class="logo">DAZZ<span>설계 문서 뷰어</span></div>
   <nav>
@@ -269,6 +331,9 @@
 
 <div id="main">
   <div id="topbar">
+    <div id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
     DAZZ &rsaquo; <strong id="topbar-title">00 · Overview</strong>
   </div>
   <div id="content">
@@ -1579,6 +1644,24 @@ resilience4j:
     gfm: true,
   });
 
+  function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    } else {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+    }
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
   function loadDoc(el) {
     const id = el.dataset.doc;
     const scriptEl = document.getElementById('doc-' + id);
@@ -1596,10 +1679,13 @@ resilience4j:
     document.getElementById('markdown-body').innerHTML = marked.parse(md);
     document.getElementById('content').scrollTop = 0;
 
-    // 코드 하이라이팅 (marked가 처리 못한 것)
+    // 코드 하이라이팅
     document.querySelectorAll('#markdown-body pre code').forEach(el => {
       hljs.highlightElement(el);
     });
+
+    // 모바일에서 문서 선택 시 사이드바 닫기
+    if (window.innerWidth <= 700) closeSidebar();
   }
 
   // 초기 로드
