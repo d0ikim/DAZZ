@@ -46,6 +46,7 @@ dependencies {
     testImplementation("io.cucumber:cucumber-junit-platform-engine:7.22.2")
     testImplementation("io.rest-assured:rest-assured:5.5.5")
     testCompileOnly("org.projectlombok:lombok")
+    testImplementation("org.junit.platform:junit-platform-suite")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
 }
