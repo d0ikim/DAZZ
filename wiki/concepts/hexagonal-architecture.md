@@ -3,7 +3,7 @@
 **Summary**: DAZZ의 근간 아키텍처. Domain이 Infrastructure를 모르도록 Port(인터페이스)로 격리한다. 계층 간 역방향 의존 절대 금지.
 **Tags**: #architecture #domain #port #adapter
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-21
+**Last Updated**: 2026-05-21 (Walking Skeleton 완료)
 
 ---
 
@@ -153,10 +153,29 @@ Testcontainers는 CI 환경에 유리하지만, 로컬 개발 단계에서는 `d
 
 **TestAdapter 패턴:**
 - 위치: `src/test/java/com/dazz/backend/support/TestAdapter.java`
-- `@LocalServerPort`로 RANDOM_PORT 자동 주입 → 포트 하드코딩 제거
-- `@PostConstruct`로 RestAssured 설정을 앱 기동 시 한 번만 세팅
 - 모든 step 정의에서 `testAdapter.get("/path")`로 HTTP 호출 통일
 - JWT 인증 필요 시 `getWithToken(path, token)` 메서드 추가로 확장
+
+**주의: `@LocalServerPort` 타이밍 버그**
+
+`@LocalServerPort`는 `@Value("${local.server.port}")` 의 alias다.
+`local.server.port` 프로퍼티는 Tomcat이 **완전히 기동된 후**에야 등록된다.
+그런데 `@Component` 빈은 **컨텍스트 refresh 중 (Tomcat 기동 전)** 생성된다.
+→ 빈 생성 시점에 `@LocalServerPort`로 주입하면 `PlaceholderResolutionException` 발생.
+
+**해결: Environment 지연 조회**
+
+```java
+@Autowired
+private Environment environment;
+
+private int getPort() {
+    // 메서드 호출 시점(테스트 실행 시점) = Tomcat 완전 기동 후 → 정상 조회
+    return environment.getProperty("local.server.port", Integer.class, 8080);
+}
+```
+
+HTTP 메서드 안에서 `getPort()`를 호출하므로, 실제 테스트가 시작될 때만 포트를 읽는다.
 
 ---
 

@@ -10,6 +10,7 @@
 
 ## 2026-05
 
+- 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Walking Skeleton 완료: @LocalServerPort 타이밍 버그 원인(빈 생성 시점 vs Tomcat 기동 시점) 및 Environment 지연 조회 해결책 추가
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — TestAdapter 패턴 추가: HTTP 추상화 계층, JWT 확장 지점 설계
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Cucumber 테스트 전략 추가: RANDOM_PORT 이유, TestcontainersConfiguration vs Docker Compose 선택 근거
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — SecurityConfig 적용 결과 추가: 익명 접근 403, JWT 추가 시 401로 전환 예정
