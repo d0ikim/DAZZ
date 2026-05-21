@@ -3,7 +3,7 @@
 **Summary**: DAZZ의 근간 아키텍처. Domain이 Infrastructure를 모르도록 Port(인터페이스)로 격리한다. 계층 간 역방향 의존 절대 금지.
 **Tags**: #architecture #domain #port #adapter
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-05-21
 
 ---
 
@@ -104,6 +104,29 @@ DAZZ는 다양한 외부 의존성을 가진다:
 
 인프라가 바뀌어도 (MySQL → PostgreSQL) Domain 코드를 건드리지 않으려면
 이 격리 구조가 필수다.
+
+---
+
+## 로컬 개발 환경 포트 (Docker)
+
+| 인프라 | 컨테이너 내부 | 로컬 접근 포트 | 비고 |
+|---|---|---|---|
+| MySQL 8.0 | 3306 | **3307** | 로컬 MySQL 충돌 방지 |
+| Redis 7 | 6379 | 6379 | - |
+| Kafka | 9092 | 9092 | - |
+
+Spring Boot `application.yaml`에서 MySQL만 3307로 설정. 나머지는 기본값 사용.
+
+---
+
+## Spring Security 기본 동작 (Boot 3.x)
+
+Spring Boot 3.x + Spring Security 조합에서:
+- `/actuator/health` → **인증 없이 허용** (기본값)
+- 나머지 API 엔드포인트 → 인증 필요
+
+`SecurityConfig`는 health 엔드포인트를 열기 위해 필요한 게 아니라,
+**나머지 API에 대한 인증 정책(JWT 등)을 명시하기 위해** 필요하다.
 
 ---
 
