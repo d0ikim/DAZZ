@@ -151,6 +151,13 @@ Testcontainers는 CI 환경에 유리하지만, 로컬 개발 단계에서는 `d
 - `.feature` 파일 위치: `src/test/resources/features/`
 - Step 정의 위치: `com.dazz.backend.steps`
 
+**TestAdapter 패턴:**
+- 위치: `src/test/java/com/dazz/backend/support/TestAdapter.java`
+- `@LocalServerPort`로 RANDOM_PORT 자동 주입 → 포트 하드코딩 제거
+- `@PostConstruct`로 RestAssured 설정을 앱 기동 시 한 번만 세팅
+- 모든 step 정의에서 `testAdapter.get("/path")`로 HTTP 호출 통일
+- JWT 인증 필요 시 `getWithToken(path, token)` 메서드 추가로 확장
+
 ---
 
 ## 관련 페이지
