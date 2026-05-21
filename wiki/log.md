@@ -10,6 +10,7 @@
 
 ## 2026-05
 
+- 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Cucumber 테스트 전략 추가: RANDOM_PORT 이유, TestcontainersConfiguration vs Docker Compose 선택 근거
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — SecurityConfig 적용 결과 추가: 익명 접근 403, JWT 추가 시 401로 전환 예정
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — 로컬 dev 환경 포트 확정 (MySQL 3307, Redis 6379, Kafka 9092) 및 Spring Security 기본 동작 메모 추가
 - 2026-05-21 — updated — `wiki/entities/kafka.md` — Spring Boot 3.4.x에서 spring-boot-starter-kafka 대신 spring-kafka 직접 사용으로 변경 반영
