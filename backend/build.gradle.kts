@@ -1,30 +1,32 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.6"
-    id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot") version "3.4.5"
 }
 
 group = "com.dazz"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    toolchain {
-        // Spring Boot 4.x = Spring Framework 7.x = Java 21 필수
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
     mavenCentral()
 }
 
-extra["springCloudVersion"] = "2025.1.1"
-
 dependencies {
+    // BOM — implementation / annotationProcessor / test 각각 적용 필요 (설정 간 상속 없음)
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
+    implementation(platform("org.springframework.cloud:spring-cloud-dependencies:2024.0.1"))
+    annotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
+    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
+    testAnnotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
+
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-data-redis")
-    implementation("org.springframework.boot:spring-boot-starter-kafka")
+    implementation("org.redisson:redisson-spring-boot-starter:3.36.0")
+    implementation("org.springframework.kafka:spring-kafka")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -46,12 +48,6 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
 }
 
 tasks.withType<Test> {

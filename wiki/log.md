@@ -10,6 +10,7 @@
 
 ## 2026-05
 
+- 2026-05-21 — updated — `wiki/entities/kafka.md` — Spring Boot 3.4.x에서 spring-boot-starter-kafka 대신 spring-kafka 직접 사용으로 변경 반영
 - 2026-05-19 — created — `wiki/decisions/no-docent-note-in-mvp.md` — MVP에서 도슨트 노트 미구현 결정 및 Post-MVP 조건 정리
 - 2026-05-19 — created — `wiki/decisions/monorepo.md` — backend + frontend 모노레포 구성 결정 근거
 - 2026-05-19 — created — `wiki/decisions/mvp-option-b.md` — 뮤지션 셀프온보딩 MVP 전략 채택 근거

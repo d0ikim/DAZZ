@@ -3,7 +3,11 @@
 **Summary**: DAZZ의 비동기 이벤트 버스. 협업 등록 이후 가중치 재계산/캐시 무효화/알림 발송을 Fan-out 처리. 메시지 영속성과 Replay가 핵심 채택 이유.
 **Tags**: #infrastructure #messaging #event #async
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-05-21
+
+> **라이브러리**: `org.springframework.kafka:spring-kafka` 직접 사용.
+> Spring Boot 3.4.x 환경에서 `spring-boot-starter-kafka`는 BOM 미관리 상태라 제외.
+> Spring Boot auto-configuration이 classpath의 `spring-kafka`를 감지해 자동 설정.
 
 ---
 
