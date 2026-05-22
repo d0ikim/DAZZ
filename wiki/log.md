@@ -10,6 +10,16 @@
 
 ## 2026-05
 
+- 2026-05-22 — created — `domain/shared/*` — BusinessException, ErrorCode, DomainEvent 공통 기반 생성
+- 2026-05-22 — created — `domain/musician/*` — Musician(Aggregate Root), Collaboration, Position/VerificationTier/RelationType enum, MusicianNotFoundException
+- 2026-05-22 — created — `domain/album/*` — Album, AlbumParticipation, ParticipationType enum
+- 2026-05-22 — created — `domain/group/*` — Group, GroupMember (US-03 팀 정보)
+- 2026-05-22 — created — `domain/performance/*` — Club, Performance, PerformanceLineup
+- 2026-05-22 — created — `domain/user/*` — User, UserRole enum
+- 2026-05-22 — created — `application/port/out/*` — 7개 Repository 인터페이스 (Musician/Collaboration/Album/Group/Club/Performance/User)
+- 2026-05-22 — updated — `docs/04-schema.md` — MVP ERD 기준으로 전면 재작성
+- 2026-05-22 — updated — `wiki/entities/musician.md` — position/sns_url/VerificationTier 기본값 실제 구현과 동기화
+- 2026-05-22 — updated — `wiki/index.html` — musician/user/collaboration 인라인 문서 MVP ERD 기준으로 동기화
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Walking Skeleton 완료: @LocalServerPort 타이밍 버그 원인(빈 생성 시점 vs Tomcat 기동 시점) 및 Environment 지연 조회 해결책 추가
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — TestAdapter 패턴 추가: HTTP 추상화 계층, JWT 확장 지점 설계
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Cucumber 테스트 전략 추가: RANDOM_PORT 이유, TestcontainersConfiguration vs Docker Compose 선택 근거

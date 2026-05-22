@@ -748,10 +748,11 @@ API 응답에서는 `docentNote: null` 로 반환.
 **Summary**: DAZZ의 핵심 Aggregate Root. 뮤지션 프로필, 신뢰 등급, UUID 기반 식별을 담당한다.
 **Tags**: #domain #aggregate-root #entity
 **Created**: 2026-05-19
+**Last Updated**: 2026-05-22
 
 ---
 
-## 핵심 필드
+## 핵심 필드 (MVP ERD 기준)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
@@ -759,10 +760,11 @@ API 응답에서는 `docentNote: null` 로 반환.
 | `uuid` | CHAR(36) | **외부 식별자**. API, 분산락 키 등 외부에 노출되는 ID |
 | `user_id` | BIGINT (NULLABLE) | 연결된 USER. NULL이면 Public Profile 상태 |
 | `stage_name` | VARCHAR(100) | 활동명. 검색/표시에 사용 |
-| `primary_position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
-| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `UNVERIFIED` |
+| `position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
+| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `PUBLIC_PROFILE` |
 | `bio` | TEXT | 본인 작성 소개글 |
-| `profile_image_url` | VARCHAR(500) | S3 URL |
+| `sns_url` | VARCHAR(500) | SNS 링크 (인스타그램 등) |
+| `profile_image_url` | VARCHAR(500) | 프로필 이미지 URL |
 
 ---
 
@@ -815,7 +817,7 @@ Musician (1) ──── (0..1) User
 Musician (1) ──── (N) Collaboration  ← weight 있는 협업 관계
 Musician (M) ──── (N via ALBUM_PARTICIPATION) Album
 Musician (M) ──── (N via PERFORMANCE_LINEUP) Performance
-Musician (1) ──── (N) DocentNote
+Musician (M) ──── (N via GROUP_MEMBER) Group
 ```
 
 ---
@@ -861,7 +863,6 @@ COLLABORATION
 ├── to_musician_id    BIGINT FK NOT NULL  ← 항상 큰 ID
 ├── relation_type     VARCHAR(30)         ← COLLABORATION / MENTOR / BAND_MEMBER
 ├── weight            INT DEFAULT 1       ← 협업 횟수 (동시성 제어 대상)
-├── last_collaborated_at  DATETIME
 └── UNIQUE(from_musician_id, to_musician_id, relation_type)
 ```
 
@@ -1086,16 +1087,16 @@ Redis 다운 시:
 
 ---
 
-## DB 구조
+## DB 구조 (MVP ERD 기준)
 
 ```sql
 USER
-├── id                BIGINT PK AUTO_INCREMENT
-├── email             VARCHAR(255) UNIQUE NOT NULL  ← 로그인 식별자
-├── password_hash     VARCHAR(255) NOT NULL          ← BCrypt
-├── display_name      VARCHAR(100) NOT NULL
-├── role              VARCHAR(20) DEFAULT 'USER'     ← USER / ADMIN
-└── email_verified_at DATETIME NULLABLE
+├── id          BIGINT PK AUTO_INCREMENT
+├── email       VARCHAR(255) UNIQUE NOT NULL  ← 로그인 식별자
+├── password    VARCHAR(255) NOT NULL          ← BCrypt 해시값
+├── nickname    VARCHAR(100) NOT NULL
+├── role        VARCHAR(20) DEFAULT 'USER'     ← USER / ADMIN
+└── created_at  DATETIME NOT NULL
 ```
 
 ---
@@ -1593,6 +1594,11 @@ MVP에서는 이 테이블을 생성만 해두고 읽거나 쓰는 API는 노출
 
 ## 2026-05
 
+- 2026-05-22 — updated — `docs/04-schema.md` — MVP ERD 기준으로 전면 재작성 (CLUB/GROUP 추가, VENUE→CLUB, DocentNote Phase 2로 이동)
+- 2026-05-22 — updated — `wiki/entities/musician.md` — position/sns_url/verification_tier 기본값 실제 구현과 동기화
+- 2026-05-22 — updated — `wiki/entities/user.md` — nickname/password 필드명 ERD 기준으로 정정
+- 2026-05-22 — updated — `wiki/entities/collaboration.md` — MVP 미사용 last_collaborated_at 제거
+- 2026-05-22 — created — Domain Layer: 도메인 클래스 10개 + Repository 인터페이스 7개 생성 (compileJava BUILD SUCCESSFUL)
 - 2026-05-19 — created — `wiki/decisions/no-docent-note-in-mvp.md` — MVP에서 도슨트 노트 미구현 결정 및 Post-MVP 조건 정리
 - 2026-05-19 — created — `wiki/decisions/monorepo.md` — backend + frontend 모노레포 구성 결정 근거
 - 2026-05-19 — created — `wiki/decisions/mvp-option-b.md` — 뮤지션 셀프온보딩 MVP 전략 채택 근거
