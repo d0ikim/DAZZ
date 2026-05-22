@@ -842,12 +842,12 @@ infra/
 ## 1. 핵심 엔티티 한눈에
 
 ```
-USER ──(1:1 Optional)── MUSICIAN ──┬── (1:N) ── COLLABORATION (self-ref)
+USER ──(1:1 Optional)── MUSICIAN ──┬── (1:N) ── COLLABORATION (self-ref via from/to)
                                    ├── (M:N via ALBUM_PARTICIPATION) ── ALBUM
-                                   └── (M:N via PERFORMANCE_LINEUP) ── PERFORMANCE
-                                                                       └─ (N:1) VENUE
-DOCENT_NOTE ──(N:1)── MUSICIAN
-SUBSCRIPTION ──(M:N)── USER × MUSICIAN
+                                   ├── (M:N via PERFORMANCE_LINEUP) ── PERFORMANCE ──(N:1)── CLUB
+                                   └── (M:N via GROUP_MEMBER) ── GROUP
+
+※ DOCENT_NOTE, SUBSCRIPTION → Phase 2 (MVP 제외)
 ```
 
 ---
@@ -859,19 +859,21 @@ SUBSCRIPTION ──(M:N)── USER × MUSICIAN
 | 컬럼 | 타입 | 제약 | 설명 |
 | --- | --- | --- | --- |
 | `id` | BIGINT PK | AUTO_INCREMENT | 내부 식별자 |
-| `uuid` | CHAR(36) | UNIQUE NOT NULL | **동명이인 방지용 외부 식별자** |
+| `uuid` | CHAR(36) | UNIQUE NOT NULL | **동명이인 방지용 외부 식별자 (EC-02)** |
 | `user_id` | BIGINT FK | UNIQUE, NULLABLE | USER 1:1 Optional |
 | `stage_name` | VARCHAR(100) | NOT NULL | 활동명 |
 | `real_name` | VARCHAR(100) | NULLABLE | 본명 (선택 공개) |
-| `primary_position` | VARCHAR(30) | NOT NULL | Vocal/Piano/Bass... |
-| `birth_year` | SMALLINT | NULLABLE | 동명이인 구분용 |
+| `position` | VARCHAR(30) | NOT NULL | Vocal/Piano/Bass... |
 | `bio` | TEXT | NULLABLE | 본인 작성 소개 |
-| `profile_image_url` | VARCHAR(500) | NULLABLE | S3 URL |
-| `verification_tier` | VARCHAR(20) | NOT NULL DEFAULT 'UNVERIFIED' | 신뢰등급 |
-| `created_at`, `updated_at` | DATETIME | NOT NULL | 감사 |
+| `sns_url` | VARCHAR(500) | NULLABLE | SNS 링크 (인스타그램 등) |
+| `profile_image_url` | VARCHAR(500) | NULLABLE | 프로필 이미지 URL |
+| `verification_tier` | VARCHAR(20) | NOT NULL DEFAULT 'PUBLIC_PROFILE' | 신뢰등급 (EC-01) |
+| `created_at` | DATETIME | NOT NULL | |
+
+**VerificationTier 값**: `PUBLIC_PROFILE` → `UNVERIFIED` → `VERIFIED_USER` → `VERIFIED_PRO`
 
 **핵심 설계 결정**:
-- `user_id`의 `UNIQUE + NULLABLE`: 시스템이 먼저 뮤지션 정보를 등록(Nullable)하고, 본인이 나타나 연결 가능
+- `user_id` UNIQUE + NULLABLE: 시스템 선등록(NULL) → 본인 인계 시 연결. 한 유저 = 최대 1개 뮤지션 프로필
 - `uuid`: 협업 데이터 입력 시 동명이인 오염 방지의 핵심
 
 ### 2.2 `USER` (서비스 사용자)
@@ -880,82 +882,86 @@ SUBSCRIPTION ──(M:N)── USER × MUSICIAN
 | --- | --- | --- | --- |
 | `id` | BIGINT PK | AUTO_INCREMENT | |
 | `email` | VARCHAR(255) | UNIQUE NOT NULL | 로그인 식별자 |
-| `password_hash` | VARCHAR(255) | NOT NULL | BCrypt |
-| `display_name` | VARCHAR(100) | NOT NULL | |
+| `password` | VARCHAR(255) | NOT NULL | BCrypt 해시값 |
+| `nickname` | VARCHAR(100) | NOT NULL | 표시 이름 |
 | `role` | VARCHAR(20) | NOT NULL DEFAULT 'USER' | USER / ADMIN |
-| `email_verified_at` | DATETIME | NULLABLE | |
+| `created_at` | DATETIME | NOT NULL | |
 
 ### 2.3 `ALBUM` (앨범)
 
-| 컬럼 | 타입 | 설명 |
-| --- | --- | --- |
-| `id` | BIGINT PK | |
-| `title` | VARCHAR(255) | |
-| `release_date` | DATE | |
-| `cover_image_url` | VARCHAR(500) | |
-| `genre_primary` | VARCHAR(50) | |
+| 컬럼 | 타입 | 제약 | 설명 |
+| --- | --- | --- | --- |
+| `id` | BIGINT PK | AUTO_INCREMENT | |
+| `title` | VARCHAR(255) | NOT NULL | |
+| `release_date` | DATE | NULLABLE | |
+| `cover_image_url` | VARCHAR(500) | NULLABLE | |
+| `album_review` | TEXT | NULLABLE | 곡 해석 및 해설 (도슨트 관점 코멘트) |
 
-> ⚠️ `ALBUM`에 **`leader_id` 컬럼을 두지 않는다**. 모든 참여 관계는 `ALBUM_PARTICIPATION`을 거친다.
-
-### 2.4 `ALBUM_PARTICIPATION` (앨범 참여 — 핵심 N:M 관계)
+### 2.4 `ALBUM_PARTICIPATION` (앨범 참여 — N:M)
 
 | 컬럼 | 타입 | 제약 | 설명 |
 | --- | --- | --- | --- |
-| `id` | BIGINT PK | | |
-| `album_id` | BIGINT FK | NOT NULL | 고아 데이터 방지 |
-| `musician_id` | BIGINT FK | NOT NULL | 고아 데이터 방지 |
-| `participation_type` | VARCHAR(30) | NOT NULL | LEADER / SIDEMAN / FEATURING / PRODUCER |
-| `instrument` | VARCHAR(30) | NULLABLE | 연주 악기 |
+| `id` | BIGINT PK | AUTO_INCREMENT | |
+| `album_id` | BIGINT FK | NOT NULL | |
+| `musician_id` | BIGINT FK | NOT NULL | |
+| `participation_type` | VARCHAR(30) | NOT NULL | LEADER / SIDEMAN / COMPOSER |
 
 **인덱스**:
-- `(musician_id, participation_type)` — Sideman 이력 조회 핵심
-- `(album_id)` — 앨범 참여진 조회
-- UNIQUE: `(album_id, musician_id, participation_type, instrument)`
+- `(musician_id, participation_type)` — Sideman 이력 조회
+- UNIQUE: `(album_id, musician_id, participation_type)`
 
 ### 2.5 `COLLABORATION` (협업 관계 — Self-referencing)
 
 | 컬럼 | 타입 | 제약 | 설명 |
 | --- | --- | --- | --- |
-| `id` | BIGINT PK | | |
+| `id` | BIGINT PK | AUTO_INCREMENT | |
 | `from_musician_id` | BIGINT FK | NOT NULL | |
 | `to_musician_id` | BIGINT FK | NOT NULL | |
 | `relation_type` | VARCHAR(30) | NOT NULL | COLLABORATION / MENTOR / BAND_MEMBER |
 | `weight` | INT | NOT NULL DEFAULT 1 | 협업 횟수 (동시성 제어 대상) |
-| `last_collaborated_at` | DATETIME | NULLABLE | |
 
-**제약**: `from_musician_id < to_musician_id` (대칭 관계 중복 저장 방지)
+**제약**: UNIQUE `(from_musician_id, to_musician_id, relation_type)`
 
-### 2.6 `PERFORMANCE` & `PERFORMANCE_LINEUP`
+### 2.6 `GROUP` & `GROUP_MEMBER` (밴드/팀)
+
+```
+GROUP
+  - id, group_name (NOT NULL), genre_tags, description
+
+GROUP_MEMBER
+  - id, group_id (FK NOT NULL), musician_id (FK NOT NULL), role
+  - UNIQUE(group_id, musician_id)
+```
+
+### 2.7 `CLUB` (공연장)
+
+```
+CLUB
+  - id, name (NOT NULL), location, instagram_url
+```
+
+### 2.8 `PERFORMANCE` & `PERFORMANCE_LINEUP`
 
 ```
 PERFORMANCE
-  - id, venue_id (FK NOT NULL), performance_datetime, title, ticket_price
-  - genre_primary, description
+  - id, club_id (FK NOT NULL), start_time (NOT NULL), title (NOT NULL)
+  - genre, set_list
+  - INDEX(club_id, start_time)
 
 PERFORMANCE_LINEUP
   - id, performance_id (FK NOT NULL), musician_id (FK NOT NULL)
-  - role (LEADER / SIDEMAN), instrument
-  - UNIQUE(performance_id, musician_id, role)
+  - set_info (1부/2부 등 상세)
+  - UNIQUE(performance_id, musician_id)
 ```
 
-### 2.7 `VENUE` (공연장)
+> `musician_id` NOT NULL: 라인업 클릭 시 반드시 뮤지션 프로필로 연결 보장
 
-```
-VENUE
-  - id, name, address, latitude, longitude
-  - operating_hours, has_jam_session (bool)
-  - phone, sns_url
-```
+### 2.9 MVP 제외 테이블 (Phase 2)
 
-### 2.8 `DOCENT_NOTE` (도슨트 노트)
-
-| 컬럼 | 타입 | 설명 |
-| --- | --- | --- |
-| `musician_id` | BIGINT FK | 대상 뮤지션 |
-| `style_tags` | JSON | ["#비밥", "#서정적"] |
-| `summary` | TEXT | 한 줄 요약 |
-| `content` | TEXT | 본문 |
-| `author_id` | BIGINT FK | 작성자 USER |
+| 테이블 | 이유 |
+| --- | --- |
+| `DOCENT_NOTE` | 뮤지션 데이터 충분히 쌓인 후 Verified User 기여 방식으로 구현 |
+| `SUBSCRIPTION` | 알림 기능 Phase 2 |
 
 ---
 
@@ -965,7 +971,7 @@ VENUE
 | --- | --- | --- |
 | `ALBUM_PARTICIPATION` | `(musician_id, participation_type)` | Sideman 이력 조회 |
 | `COLLABORATION` | `(from_musician_id, weight DESC)` | 가중치 높은 협업 순 |
-| `PERFORMANCE` | `(performance_datetime, venue_id)` | 공연 일정 조회 |
+| `PERFORMANCE` | `(club_id, start_time)` | 클럽별 공연 일정 조회 |
 | `MUSICIAN` | `(uuid)` UNIQUE | 외부 식별자 조회 |
 | `MUSICIAN` | `(stage_name)` | 이름 검색 |
 

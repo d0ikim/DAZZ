@@ -10,6 +10,8 @@
 
 ## 2026-05
 
+- 2026-05-22 — updated — `docs/index.html` — 엔티티 다이어그램 VENUE→CLUB, GROUP 추가, Phase2 표기; 인덱스 전략 performance_datetime/venue_id→club_id/start_time
+- 2026-05-22 — updated — `wiki/index.html` — Collaboration last_collaborated_at 잔존 참조 제거; VENUE.image_urls→CLUB 수정; no-docent-note MVP 범위 ✅→❌ 정정
 - 2026-05-22 — created — `domain/shared/*` — BusinessException, ErrorCode, DomainEvent 공통 기반 생성
 - 2026-05-22 — created — `domain/musician/*` — Musician(Aggregate Root), Collaboration, Position/VerificationTier/RelationType enum, MusicianNotFoundException
 - 2026-05-22 — created — `domain/album/*` — Album, AlbumParticipation, ParticipationType enum
