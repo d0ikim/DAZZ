@@ -748,10 +748,11 @@ API 응답에서는 `docentNote: null` 로 반환.
 **Summary**: DAZZ의 핵심 Aggregate Root. 뮤지션 프로필, 신뢰 등급, UUID 기반 식별을 담당한다.
 **Tags**: #domain #aggregate-root #entity
 **Created**: 2026-05-19
+**Last Updated**: 2026-05-22
 
 ---
 
-## 핵심 필드
+## 핵심 필드 (MVP ERD 기준)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
@@ -759,10 +760,11 @@ API 응답에서는 `docentNote: null` 로 반환.
 | `uuid` | CHAR(36) | **외부 식별자**. API, 분산락 키 등 외부에 노출되는 ID |
 | `user_id` | BIGINT (NULLABLE) | 연결된 USER. NULL이면 Public Profile 상태 |
 | `stage_name` | VARCHAR(100) | 활동명. 검색/표시에 사용 |
-| `primary_position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
-| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `UNVERIFIED` |
+| `position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
+| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `PUBLIC_PROFILE` |
 | `bio` | TEXT | 본인 작성 소개글 |
-| `profile_image_url` | VARCHAR(500) | S3 URL |
+| `sns_url` | VARCHAR(500) | SNS 링크 (인스타그램 등) |
+| `profile_image_url` | VARCHAR(500) | 프로필 이미지 URL |
 
 ---
 
@@ -815,7 +817,7 @@ Musician (1) ──── (0..1) User
 Musician (1) ──── (N) Collaboration  ← weight 있는 협업 관계
 Musician (M) ──── (N via ALBUM_PARTICIPATION) Album
 Musician (M) ──── (N via PERFORMANCE_LINEUP) Performance
-Musician (1) ──── (N) DocentNote
+Musician (M) ──── (N via GROUP_MEMBER) Group
 ```
 
 ---
@@ -861,7 +863,6 @@ COLLABORATION
 ├── to_musician_id    BIGINT FK NOT NULL  ← 항상 큰 ID
 ├── relation_type     VARCHAR(30)         ← COLLABORATION / MENTOR / BAND_MEMBER
 ├── weight            INT DEFAULT 1       ← 협업 횟수 (동시성 제어 대상)
-├── last_collaborated_at  DATETIME
 └── UNIQUE(from_musician_id, to_musician_id, relation_type)
 ```
 
@@ -1086,16 +1087,16 @@ Redis 다운 시:
 
 ---
 
-## DB 구조
+## DB 구조 (MVP ERD 기준)
 
 ```sql
 USER
-├── id                BIGINT PK AUTO_INCREMENT
-├── email             VARCHAR(255) UNIQUE NOT NULL  ← 로그인 식별자
-├── password_hash     VARCHAR(255) NOT NULL          ← BCrypt
-├── display_name      VARCHAR(100) NOT NULL
-├── role              VARCHAR(20) DEFAULT 'USER'     ← USER / ADMIN
-└── email_verified_at DATETIME NULLABLE
+├── id          BIGINT PK AUTO_INCREMENT
+├── email       VARCHAR(255) UNIQUE NOT NULL  ← 로그인 식별자
+├── password    VARCHAR(255) NOT NULL          ← BCrypt 해시값
+├── nickname    VARCHAR(100) NOT NULL
+├── role        VARCHAR(20) DEFAULT 'USER'     ← USER / ADMIN
+└── created_at  DATETIME NOT NULL
 ```
 
 ---
@@ -1593,24 +1594,29 @@ MVP에서는 이 테이블을 생성만 해두고 읽거나 쓰는 API는 노출
 
 ## 2026-05
 
-- 2026-05-19 — created — `wiki/decisions/no-docent-note-in-mvp.md` — MVP에서 도슨트 노트 미구현 결정 및 Post-MVP 조건 정리
-- 2026-05-19 — created — `wiki/decisions/monorepo.md` — backend + frontend 모노레포 구성 결정 근거
-- 2026-05-19 — created — `wiki/decisions/mvp-option-b.md` — 뮤지션 셀프온보딩 MVP 전략 채택 근거
-- 2026-05-19 — created — `wiki/comparisons/redis-lock-vs-db-lock.md` — Redisson Pub/Sub 분산락 채택, DB 비관적 락 탈락 근거
-- 2026-05-19 — created — `wiki/comparisons/mysql-vs-mongodb.md` — 참조 무결성 필수로 MySQL 채택, MongoDB 탈락 근거
-- 2026-05-19 — created — `wiki/entities/user.md` — User↔Musician 1:1 Optional 관계, JWT 인증, role vs trust-tier 구분
-- 2026-05-19 — created — `wiki/entities/kafka.md` — Kafka 토픽 목록, Outbox 패턴, 파티션 키 전략
-- 2026-05-19 — created — `wiki/entities/redis.md` — Redis 이중 역할(캐시+락), 키 명명 규칙, TTL 근거
-- 2026-05-19 — created — `wiki/entities/collaboration.md` — 자기참조 협업 엔티티, from<to 정규화, 가중치 업데이트 규칙
-- 2026-05-19 — created — `wiki/concepts/graceful-degradation.md` — 3단계 폴백(L1/L2/L3), 항상 HTTP 200 반환 전략
-- 2026-05-19 — created — `wiki/concepts/docent-note.md` — 도슨트 노트 개념 정의, MVP 미구현 이유
-- 2026-05-19 — created — `wiki/concepts/hexagonal-architecture.md` — 헥사고날 아키텍처 레이어 규칙, Port/Adapter 패턴, 패키지 구조
-- 2026-05-19 — created — `wiki/comparisons/kafka-vs-rabbitmq.md` — Fan-out + Replay 필요로 Kafka 선택한 근거
-- 2026-05-19 — created — `wiki/entities/musician.md` — Musician Aggregate Root 구조, uuid/id 이중 식별자, 도메인 규칙
-- 2026-05-19 — created — `wiki/concepts/trust-tier.md` — 사용자 신뢰 등급 4단계 정의 및 권한 매트릭스
-- 2026-05-19 — created — `wiki/concepts/collaboration-weight.md` — 협업 가중치 정의, 동시성 문제, 분산락 패턴
-- 2026-05-19 — created — `wiki/concepts/cold-start.md` — 콜드스타트 문제 정의 및 Option B 채택 근거
-- 2026-05-19 — created — `wiki/index.md` — LLM Wiki 전체 진입점 및 카탈로그 초기 생성
+- 2026-05-22 — updated — `docs/04-schema.md` — MVP ERD 기준으로 전면 재작성 (CLUB/GROUP 추가, VENUE→CLUB, DocentNote Phase 2로 이동)
+- 2026-05-22 — updated — [[entities/musician]] — position/sns_url/verification_tier 기본값 실제 구현과 동기화
+- 2026-05-22 — updated — [[entities/user]] — nickname/password 필드명 ERD 기준으로 정정
+- 2026-05-22 — updated — [[entities/collaboration]] — MVP 미사용 last_collaborated_at 제거
+- 2026-05-22 — created — `domain/*`, `application/port/out/*` — 도메인 클래스 10개 + Repository 인터페이스 7개 생성 (compileJava BUILD SUCCESSFUL)
+- 2026-05-19 — created — [[decisions/no-docent-note-in-mvp]] — MVP에서 도슨트 노트 미구현 결정 및 Post-MVP 조건 정리
+- 2026-05-19 — created — [[decisions/monorepo]] — backend + frontend 모노레포 구성 결정 근거
+- 2026-05-19 — created — [[decisions/mvp-option-b]] — 뮤지션 셀프온보딩 MVP 전략 채택 근거
+- 2026-05-19 — created — [[comparisons/redis-lock-vs-db-lock]] — Redisson Pub/Sub 분산락 채택, DB 비관적 락 탈락 근거
+- 2026-05-19 — created — [[comparisons/mysql-vs-mongodb]] — 참조 무결성 필수로 MySQL 채택, MongoDB 탈락 근거
+- 2026-05-19 — created — [[entities/user]] — User↔Musician 1:1 Optional 관계, JWT 인증, role vs trust-tier 구분
+- 2026-05-19 — created — [[entities/kafka]] — Kafka 토픽 목록, Outbox 패턴, 파티션 키 전략
+- 2026-05-19 — created — [[entities/redis]] — Redis 이중 역할(캐시+락), 키 명명 규칙, TTL 근거
+- 2026-05-19 — created — [[entities/collaboration]] — 자기참조 협업 엔티티, from<to 정규화, 가중치 업데이트 규칙
+- 2026-05-19 — created — [[concepts/graceful-degradation]] — 3단계 폴백(L1/L2/L3), 항상 HTTP 200 반환 전략
+- 2026-05-19 — created — [[concepts/docent-note]] — 도슨트 노트 개념 정의, MVP 미구현 이유
+- 2026-05-19 — created — [[concepts/hexagonal-architecture]] — 헥사고날 아키텍처 레이어 규칙, Port/Adapter 패턴, 패키지 구조
+- 2026-05-19 — created — [[comparisons/kafka-vs-rabbitmq]] — Fan-out + Replay 필요로 Kafka 선택한 근거
+- 2026-05-19 — created — [[entities/musician]] — Musician Aggregate Root 구조, uuid/id 이중 식별자, 도메인 규칙
+- 2026-05-19 — created — [[concepts/trust-tier]] — 사용자 신뢰 등급 4단계 정의 및 권한 매트릭스
+- 2026-05-19 — created — [[concepts/collaboration-weight]] — 협업 가중치 정의, 동시성 문제, 분산락 패턴
+- 2026-05-19 — created — [[concepts/cold-start]] — 콜드스타트 문제 정의 및 Option B 채택 근거
+- 2026-05-19 — created — `wiki/index.html` — LLM Wiki 전체 진입점 및 카탈로그 초기 생성
 - 2026-05-19 — created — `wiki/log.md` — 변경 이력 추적 파일 초기 생성
 </script>
 

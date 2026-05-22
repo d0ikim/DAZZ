@@ -3,11 +3,11 @@
 **Summary**: DAZZ의 핵심 Aggregate Root. 뮤지션 프로필, 신뢰 등급, UUID 기반 식별을 담당한다.
 **Tags**: #domain #aggregate-root #entity
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-05-22
 
 ---
 
-## 핵심 필드
+## 핵심 필드 (MVP ERD 기준)
 
 | 필드 | 타입 | 설명 |
 | --- | --- | --- |
@@ -15,10 +15,11 @@
 | `uuid` | CHAR(36) | **외부 식별자**. API, 분산락 키 등 외부에 노출되는 ID |
 | `user_id` | BIGINT (NULLABLE) | 연결된 USER. NULL이면 Public Profile 상태 |
 | `stage_name` | VARCHAR(100) | 활동명. 검색/표시에 사용 |
-| `primary_position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
-| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `UNVERIFIED` |
+| `position` | VARCHAR(30) | 주 악기 (Piano, Bass, Drums...) |
+| `verification_tier` | VARCHAR(20) | 신뢰 등급. 기본값 `PUBLIC_PROFILE` |
 | `bio` | TEXT | 본인 작성 소개글 |
-| `profile_image_url` | VARCHAR(500) | S3 URL |
+| `sns_url` | VARCHAR(500) | SNS 링크 (인스타그램 등) |
+| `profile_image_url` | VARCHAR(500) | 프로필 이미지 URL |
 
 ---
 
