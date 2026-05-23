@@ -10,6 +10,12 @@
 
 ## 2026-05
 
+- 2026-05-23 — updated — `docs/05-api-spec.md` + `docs/index.html` — 에러 코드 전체 정의 (COM/M/A/C/G/P/U 도메인별, 내부코드 포함)
+- 2026-05-23 — updated — `wiki/index.html` — Musician 예외 클래스 표 추가, 패키지 구조 업데이트, 변경이력 추가
+- 2026-05-23 — created — `domain/musician/exception/*` — MusicianAlreadyClaimedException(M002), MusicianUserAlreadyLinkedException(M003)
+- 2026-05-23 — created — `application/musician/*` — QueryService(readOnly), CommandService, RegisterCommand
+- 2026-05-23 — created — `infrastructure/persistence/*` — JPA Entity 10개, Spring Data Repo 10개, 구현체 7개
+- 2026-05-23 — created — `db/migration/V900~V905` — Flyway 마이그레이션 전체 테이블
 - 2026-05-22 — updated — `docs/index.html` — 엔티티 다이어그램 VENUE→CLUB, GROUP 추가, Phase2 표기; 인덱스 전략 performance_datetime/venue_id→club_id/start_time
 - 2026-05-22 — updated — `wiki/index.html` — Collaboration last_collaborated_at 잔존 참조 제거; VENUE.image_urls→CLUB 수정; no-docent-note MVP 범위 ✅→❌ 정정
 - 2026-05-22 — created — `domain/shared/*` — BusinessException, ErrorCode, DomainEvent 공통 기반 생성
