@@ -10,6 +10,10 @@
 
 ## 2026-05
 
+- 2026-05-23 — created — `infrastructure/config/SwaggerConfig` — springdoc OpenAPI 빈 등록
+- 2026-05-23 — updated — `infrastructure/security/SecurityConfig` — Swagger UI, /api/v1/** 허용
+- 2026-05-23 — created — `api/common/*` — ApiResponse, ErrorResponse, GlobalExceptionHandler
+- 2026-05-23 — updated — `wiki/concepts/hexagonal-architecture` — 실제 패키지 구조 최신화
 - 2026-05-23 — updated — `docs/05-api-spec.md` + `docs/index.html` — 에러 코드 전체 정의 (COM/M/A/C/G/P/U 도메인별, 내부코드 포함)
 - 2026-05-23 — updated — `wiki/index.html` — Musician 예외 클래스 표 추가, 패키지 구조 업데이트, 변경이력 추가
 - 2026-05-23 — created — `domain/musician/exception/*` — MusicianAlreadyClaimedException(M002), MusicianUserAlreadyLinkedException(M003)
