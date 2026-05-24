@@ -10,6 +10,15 @@
 
 ## 2026-05
 
+- 2026-05-24 — created — `api/musician/MusicianController` — GET /api/v1/musicians/{id}/insights 컨트롤러 구현 → [[entities/musician]]
+- 2026-05-24 — created — `api/musician/dto/MusicianInsightResponse` — 인사이트 응답 DTO (profile/docentNote/network 중첩 record)
+- 2026-05-24 — created — `api/musician/mapper/MusicianInsightMapper` — MusicianInsightResult → MusicianInsightResponse 변환
+- 2026-05-24 — created — `application/musician/MusicianInsightResult` — 인사이트 서비스 반환 타입 (Musician + NetworkEntry 목록)
+- 2026-05-24 — updated — `application/musician/MusicianQueryService` — getInsight(musicianId, includeNetwork, depth) 추가, CollaborationRepository 의존성 추가
+- 2026-05-24 — updated — `application/port/out/MusicianRepository` — findAllByIds(List<Long>) 추가 (N+1 방지 배치 조회)
+- 2026-05-24 — updated — `infrastructure/persistence/musician/MusicianRepositoryImpl` — findAllByIds 구현
+- 2026-05-24 — updated — `api/common/GlobalExceptionHandler` — ConstraintViolationException 핸들러 추가 (depth @Min/@Max 검증)
+- 2026-05-24 — created — `test/api/musician/MusicianControllerTest` — Happy Path 2개 + Unhappy Path 2개 (404/400)
 - 2026-05-24 — refactored — `domain/club/Club` — domain/performance에서 독립 패키지로 분리 (DDD Bounded Context 정렬)
 - 2026-05-24 — created — `infrastructure/persistence/club/*` — ClubJpaEntity, ClubJpaRepository, ClubRepositoryImpl 신규 패키지 생성
 - 2026-05-24 — updated — `infrastructure/persistence/performance/PerformanceRepositoryImpl` — ClubRepository 구현 제거, findById 충돌 해소
