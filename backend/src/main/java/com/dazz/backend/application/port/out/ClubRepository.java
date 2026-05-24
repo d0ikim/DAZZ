@@ -1,6 +1,6 @@
 package com.dazz.backend.application.port.out;
 
-import com.dazz.backend.domain.performance.Club;
+import com.dazz.backend.domain.club.Club;
 
 import java.util.List;
 import java.util.Optional;
