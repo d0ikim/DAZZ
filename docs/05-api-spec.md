@@ -100,20 +100,57 @@ Production : https://api.dazz.kr
 
 ## 2. 표준 에러 코드
 
-| Code | HTTP | 의미 |
-| --- | --- | --- |
-| `VALIDATION_FAILED` | 400 | 요청 파라미터 검증 실패 |
-| `INVALID_REQUEST_BODY` | 400 | 잘못된 JSON 또는 필수 필드 누락 |
-| `UNAUTHORIZED` | 401 | 토큰 없음/만료 |
-| `FORBIDDEN` | 403 | 권한 없음 (예: 타인 프로필 수정) |
-| `MUSICIAN_NOT_FOUND` | 404 | 뮤지션 없음 |
-| `ALBUM_NOT_FOUND` | 404 | 앨범 없음 |
-| `DUPLICATE_COLLABORATION` | 409 | 중복 협업 등록 |
-| `IDEMPOTENCY_CONFLICT` | 409 | 동일 키로 다른 페이로드 요청 |
-| `UNVERIFIED_MUSICIAN` | 422 | 미인증 뮤지션의 편집 시도 |
-| `RATE_LIMITED` | 429 | 요청 한도 초과 |
-| `EXTERNAL_API_UNAVAILABLE` | 200 + meta.degradation | 외부 API 장애 |
-| `INTERNAL_SERVER_ERROR` | 500 | 알 수 없는 서버 오류 |
+> 에러 코드는 `ErrorCode.java` enum과 **항상 동기화**한다. 새 코드 추가 시 이 표도 갱신.
+
+### 공통 (COM)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `INVALID_INPUT` | COM001 | 400 | 요청 파라미터 검증 실패 / 필수 필드 누락 |
+| `INTERNAL_SERVER_ERROR` | COM999 | 500 | 서버 내부 오류 |
+
+### 뮤지션 (M)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `MUSICIAN_NOT_FOUND` | M001 | 404 | uuid/id에 해당하는 뮤지션 없음 |
+| `MUSICIAN_ALREADY_CLAIMED` | M002 | 409 | 이미 본인 계정이 연결된 뮤지션에 재claim 시도 |
+| `MUSICIAN_USER_ALREADY_LINKED` | M003 | 409 | 해당 User가 이미 다른 뮤지션 프로필과 연결됨 (EC-01) |
+
+### 앨범 (A)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `ALBUM_NOT_FOUND` | A001 | 404 | 앨범 없음 |
+| `ALBUM_PARTICIPATION_DUPLICATE` | A002 | 409 | 동일 (album, musician, type) 조합 중복 등록 |
+
+### 협업 (C)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `COLLABORATION_DUPLICATE` | C001 | 409 | 동일 (from, to, type) 협업 관계 중복 |
+| `COLLABORATION_SELF_REFERENCE` | C002 | 400 | 자기 자신과의 협업 등록 시도 |
+
+### 그룹 (G)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `GROUP_NOT_FOUND` | G001 | 404 | 그룹 없음 |
+| `GROUP_MEMBER_DUPLICATE` | G002 | 409 | 이미 해당 그룹의 멤버 |
+
+### 공연 (P)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `PERFORMANCE_NOT_FOUND` | P001 | 404 | 공연 없음 |
+| `CLUB_NOT_FOUND` | P002 | 404 | 클럽(공연장) 없음 |
+
+### 사용자 (U)
+
+| 코드 | 내부코드 | HTTP | 의미 |
+| --- | --- | --- | --- |
+| `USER_NOT_FOUND` | U001 | 404 | 사용자 없음 |
+| `USER_EMAIL_DUPLICATE` | U002 | 409 | 이미 사용 중인 이메일 |
 
 ---
 
@@ -162,23 +199,18 @@ Production : https://api.dazz.kr
       "uuid": "550e8400-e29b-...",
       "profile": {
         "stageName": "김재즈",
-        "primaryPosition": "Piano",
+        "position": "PIANO",
         "verificationTier": "VERIFIED_PRO",
         "profileImageUrl": "https://cdn.dazz.kr/p/102.jpg",
         "bio": "..."
       },
-      "docentNote": {
-        "styleTags": ["#비밥", "#서정적"],
-        "summary": "한국 비밥 피아노의 다음 세대",
-        "content": "..."
-      },
+      "docentNote": null,
       "network": [
         {
-          "targetId": 205,
+          "targetUuid": "550e8400-e29b-...",
           "stageName": "이재즈",
-          "primaryPosition": "Saxophone",
-          "weight": 7,
-          "lastCollaboratedAt": "2026-04-12"
+          "position": "SAX",
+          "weight": 7
         }
       ]
     },
@@ -258,7 +290,7 @@ Production : https://api.dazz.kr
 ### 3.7 Performance (공연)
 
 #### `GET /api/v1/performances`
-- **Query**: `from`, `to`, `venueId`, `musicianId`, `genre`
+- **Query**: `from`, `to`, `clubId`, `musicianId`, `genre`
 
 #### `POST /api/v1/performances`
 - 공연장 운영자 또는 Verified Pro만 가능
@@ -291,7 +323,7 @@ GET /api/v1/...?page=0&size=20&sort=createdAt,desc
 ## 5. 추후 추가 예정 (상세 명세는 별도 문서)
 
 - `GET /api/v1/musicians/{id}/performances` (공연 이력)
-- `GET /api/v1/venues/{id}` (공연장 상세)
+- `GET /api/v1/clubs/{id}` (공연장 상세)
 - `POST /api/v1/subscriptions` (구독)
 - `WebSocket /ws/collaborations` (실시간 협업 피드)
 - 결제 흐름 (PG 연동) — 별도 시퀀스 다이어그램 필요

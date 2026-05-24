@@ -23,6 +23,14 @@ dependencies {
     testImplementation(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
     testAnnotationProcessor(platform("org.springframework.boot:spring-boot-dependencies:3.4.5"))
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-mysql")
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-mysql")
+
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.redisson:redisson-spring-boot-starter:3.36.0")
