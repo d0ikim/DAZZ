@@ -20,6 +20,10 @@
 - 2026-05-24 — refactored — `domain/musician/Collaboration` — incrementWeight() 불변 업데이트 메서드 추가
 - 2026-05-24 — created — `test/domain/musician/MusicianTest` — Happy Path / Unhappy Path 단위 테스트 4개 (BUILD SUCCESSFUL)
 - 2026-05-24 — updated — `application/port/out/GroupRepository` — findGroupsByMusicianId 반환타입 List<GroupMember> → List<Group> 수정
+- 2026-05-24 — refactored — `domain/musician/Musician` — 잘못된 Lombok 주석 제거 (claim() 내부 new 생성자 직접 호출 관련)
+- 2026-05-24 — refactored — `application/musician/MusicianCommandService` — claim() 검증 순서 복원: M002(isClaimed) → M003(existsByUserId)
+- 2026-05-24 — refactored — `domain/group/Group` — genreTags List.copyOf() 방어적 복사 적용 (불변성 보장)
+- 2026-05-24 — created — `test/domain/musician/CollaborationTest` — incrementWeight() 단위 테스트 2개 (새 객체 반환 + 원본 불변 검증)
 - 2026-05-23 — created — `infrastructure/config/SwaggerConfig` — springdoc OpenAPI 빈 등록
 - 2026-05-23 — updated — `infrastructure/security/SecurityConfig` — Swagger UI, /api/v1/** 허용
 - 2026-05-23 — created — `api/common/*` — ApiResponse, ErrorResponse, GlobalExceptionHandler
