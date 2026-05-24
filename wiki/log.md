@@ -10,6 +10,16 @@
 
 ## 2026-05
 
+- 2026-05-24 — refactored — `domain/club/Club` — domain/performance에서 독립 패키지로 분리 (DDD Bounded Context 정렬)
+- 2026-05-24 — created — `infrastructure/persistence/club/*` — ClubJpaEntity, ClubJpaRepository, ClubRepositoryImpl 신규 패키지 생성
+- 2026-05-24 — updated — `infrastructure/persistence/performance/PerformanceRepositoryImpl` — ClubRepository 구현 제거, findById 충돌 해소
+- 2026-05-24 — created — `infrastructure/persistence/converter/StringListConverter` — List<String> ↔ VARCHAR 변환기
+- 2026-05-24 — updated — `domain/group/Group` — genreTags String → List<String>
+- 2026-05-24 — updated — `infrastructure/persistence/group/GroupJpaEntity` — genreTags @Convert(StringListConverter) 적용
+- 2026-05-24 — refactored — `domain/musician/Musician` — claim() 도메인 가드 추가 (isClaimed 체크를 서비스 → 도메인으로 이동)
+- 2026-05-24 — refactored — `domain/musician/Collaboration` — incrementWeight() 불변 업데이트 메서드 추가
+- 2026-05-24 — created — `test/domain/musician/MusicianTest` — Happy Path / Unhappy Path 단위 테스트 4개 (BUILD SUCCESSFUL)
+- 2026-05-24 — updated — `application/port/out/GroupRepository` — findGroupsByMusicianId 반환타입 List<GroupMember> → List<Group> 수정
 - 2026-05-23 — created — `infrastructure/config/SwaggerConfig` — springdoc OpenAPI 빈 등록
 - 2026-05-23 — updated — `infrastructure/security/SecurityConfig` — Swagger UI, /api/v1/** 허용
 - 2026-05-23 — created — `api/common/*` — ApiResponse, ErrorResponse, GlobalExceptionHandler
