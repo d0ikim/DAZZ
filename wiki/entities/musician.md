@@ -3,7 +3,7 @@
 **Summary**: DAZZ의 핵심 Aggregate Root. 뮤지션 프로필, 신뢰 등급, UUID 기반 식별을 담당한다.
 **Tags**: #domain #aggregate-root #entity
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-22
+**Last Updated**: 2026-05-24
 
 ---
 
@@ -30,7 +30,15 @@
   - 협업 등록 시 `fromMusicianUuid`로 특정 → 이름이 같아도 다른 사람
   - 내부 BIGINT id가 외부에 노출되면 순번 추측 공격 가능
 
-**규칙**: API 요청/응답에는 항상 `uuid` 사용. `id`는 코드 내부에서만.
+**현행 API 설계 (MVP 기준)**:
+
+| 엔드포인트 | 식별자 | 이유 |
+| --- | --- | --- |
+| `GET /api/v1/musicians/{musicianId}/insights` | BIGINT `id` | 사용자 spec 요구사항 (musicianId: 102 형태) |
+| 협업 등록 등 쓰기 API | UUID | 중복 방지 + 외부 노출 안전성 |
+
+> ⚠️ 인사이트 조회 API가 내부 `id`를 path param으로 노출하는 것은 MVP 결정이다.
+> Post-MVP에서 UUID 통일 여부를 재검토한다.
 
 ---
 
@@ -78,9 +86,25 @@ Musician (1) ──── (N) DocentNote
 
 ---
 
+## 인사이트 조회 API (핵심 기능)
+
+`GET /api/v1/musicians/{musicianId}/insights?includeNetwork=true&depth=1`
+
+- **응답**: 프로필 + docentNote(Post-MVP, 현재 null) + 협업 네트워크
+- **N+1 방지**: `CollaborationRepository.findByMusicianId()` → `MusicianRepository.findAllByIds()` 배치 조회
+- **depth**: 1~2 허용. MVP에서는 depth=1 동작만 구현 (직접 협업자)
+- **isVerified**: `verificationTier == VERIFIED_USER || VERIFIED_PRO` 시 true
+
 ## 패키지 위치
 
 ```
+api/musician/
+  ├── MusicianController.java          ← GET /api/v1/musicians/{id}/insights
+  ├── dto/MusicianInsightResponse.java ← 응답 DTO (중첩 record)
+  └── mapper/MusicianInsightMapper.java
+application/musician/
+  ├── MusicianQueryService.java        ← getInsight() 포함
+  └── MusicianInsightResult.java       ← 서비스 반환 타입
 domain/musician/Musician.java          ← Aggregate Root (순수 POJO)
 infrastructure/persistence/musician/
   ├── MusicianJpaEntity.java           ← @Entity (JPA 전용)
