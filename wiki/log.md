@@ -16,23 +16,23 @@
 - 2026-05-24 — created — `infrastructure/persistence/converter/StringListConverter` — List<String> ↔ VARCHAR 변환기
 - 2026-05-24 — updated — `domain/group/Group` — genreTags String → List<String>
 - 2026-05-24 — updated — `infrastructure/persistence/group/GroupJpaEntity` — genreTags @Convert(StringListConverter) 적용
-- 2026-05-24 — refactored — `domain/musician/Musician` — claim() 도메인 가드 추가 (isClaimed 체크를 서비스 → 도메인으로 이동)
-- 2026-05-24 — refactored — `domain/musician/Collaboration` — incrementWeight() 불변 업데이트 메서드 추가
-- 2026-05-24 — created — `test/domain/musician/MusicianTest` — Happy Path / Unhappy Path 단위 테스트 4개 (BUILD SUCCESSFUL)
+- 2026-05-24 — refactored — `domain/musician/Musician` — claim() 도메인 가드 추가 (isClaimed 체크를 서비스 → 도메인으로 이동) → [[entities/musician]]
+- 2026-05-24 — refactored — `domain/musician/Collaboration` — incrementWeight() 불변 업데이트 메서드 추가 → [[entities/collaboration]]
+- 2026-05-24 — created — `test/domain/musician/MusicianTest` — Happy Path / Unhappy Path 단위 테스트 4개 (BUILD SUCCESSFUL) → [[entities/musician]]
 - 2026-05-24 — updated — `application/port/out/GroupRepository` — findGroupsByMusicianId 반환타입 List<GroupMember> → List<Group> 수정
-- 2026-05-24 — refactored — `domain/musician/Musician` — 잘못된 Lombok 주석 제거 (claim() 내부 new 생성자 직접 호출 관련)
-- 2026-05-24 — refactored — `application/musician/MusicianCommandService` — claim() 검증 순서 복원: M002(isClaimed) → M003(existsByUserId)
+- 2026-05-24 — refactored — `domain/musician/Musician` — 잘못된 Lombok 주석 제거 (claim() 내부 new 생성자 직접 호출 관련) → [[entities/musician]]
+- 2026-05-24 — refactored — `application/musician/MusicianCommandService` — claim() 검증 순서 복원: M002(isClaimed) → M003(existsByUserId) · [[entities/musician]] · [[concepts/hexagonal-architecture]]
 - 2026-05-24 — refactored — `domain/group/Group` — genreTags List.copyOf() 방어적 복사 적용 (불변성 보장)
-- 2026-05-24 — created — `test/domain/musician/CollaborationTest` — incrementWeight() 단위 테스트 2개 (새 객체 반환 + 원본 불변 검증)
-- 2026-05-23 — created — `infrastructure/config/SwaggerConfig` — springdoc OpenAPI 빈 등록
-- 2026-05-23 — updated — `infrastructure/security/SecurityConfig` — Swagger UI, /api/v1/** 허용
-- 2026-05-23 — created — `api/common/*` — ApiResponse, ErrorResponse, GlobalExceptionHandler
-- 2026-05-23 — updated — `wiki/concepts/hexagonal-architecture` — 실제 패키지 구조 최신화
+- 2026-05-24 — created — `test/domain/musician/CollaborationTest` — incrementWeight() 단위 테스트 2개 (새 객체 반환 + 원본 불변 검증) → [[entities/collaboration]]
+- 2026-05-23 — created — `infrastructure/config/SwaggerConfig` — springdoc OpenAPI 빈 등록 · [[concepts/hexagonal-architecture]]
+- 2026-05-23 — updated — `infrastructure/security/SecurityConfig` — Swagger UI, /api/v1/** 허용 · [[concepts/hexagonal-architecture]]
+- 2026-05-23 — created — `api/common/*` — ApiResponse, ErrorResponse, GlobalExceptionHandler · [[concepts/hexagonal-architecture]]
+- 2026-05-23 — updated — [[concepts/hexagonal-architecture]] — 실제 패키지 구조 최신화
 - 2026-05-23 — updated — `docs/05-api-spec.md` + `docs/index.html` — 에러 코드 전체 정의 (COM/M/A/C/G/P/U 도메인별, 내부코드 포함)
 - 2026-05-23 — updated — `wiki/index.html` — Musician 예외 클래스 표 추가, 패키지 구조 업데이트, 변경이력 추가
-- 2026-05-23 — created — `domain/musician/exception/*` — MusicianAlreadyClaimedException(M002), MusicianUserAlreadyLinkedException(M003)
-- 2026-05-23 — created — `application/musician/*` — QueryService(readOnly), CommandService, RegisterCommand
-- 2026-05-23 — created — `infrastructure/persistence/*` — JPA Entity 10개, Spring Data Repo 10개, 구현체 7개
+- 2026-05-23 — created — `domain/musician/exception/*` — MusicianAlreadyClaimedException(M002), MusicianUserAlreadyLinkedException(M003) → [[entities/musician]]
+- 2026-05-23 — created — `application/musician/*` — QueryService(readOnly), CommandService, RegisterCommand · [[entities/musician]] · [[concepts/hexagonal-architecture]]
+- 2026-05-23 — created — `infrastructure/persistence/*` — JPA Entity 10개, Spring Data Repo 10개, 구현체 7개 · [[concepts/hexagonal-architecture]]
 - 2026-05-23 — created — `db/migration/V900~V905` — Flyway 마이그레이션 전체 테이블
 - 2026-05-22 — updated — `docs/index.html` — 엔티티 다이어그램 VENUE→CLUB, GROUP 추가, Phase2 표기; 인덱스 전략 performance_datetime/venue_id→club_id/start_time
 - 2026-05-22 — updated — `wiki/index.html` — Collaboration last_collaborated_at 잔존 참조 제거; VENUE.image_urls→CLUB 수정; no-docent-note MVP 범위 ✅→❌ 정정
