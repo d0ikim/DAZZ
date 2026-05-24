@@ -1,4 +1,4 @@
-package com.dazz.backend.domain.performance;
+package com.dazz.backend.domain.club;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,8 +1,6 @@
 package com.dazz.backend.infrastructure.persistence.performance;
 
-import com.dazz.backend.application.port.out.ClubRepository;
 import com.dazz.backend.application.port.out.PerformanceRepository;
-import com.dazz.backend.domain.performance.Club;
 import com.dazz.backend.domain.performance.Performance;
 import com.dazz.backend.domain.performance.PerformanceLineup;
 import lombok.RequiredArgsConstructor;
@@ -13,30 +11,10 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class PerformanceRepositoryImpl implements PerformanceRepository, ClubRepository {
+public class PerformanceRepositoryImpl implements PerformanceRepository {
 
-    private final ClubJpaRepository clubJpaRepository;
     private final PerformanceJpaRepository performanceJpaRepository;
     private final PerformanceLineupJpaRepository lineupJpaRepository;
-
-    // --- ClubRepository ---
-
-    @Override
-    public Club save(Club club) {
-        return toDomain(clubJpaRepository.save(toJpaEntity(club)));
-    }
-
-    @Override
-    public Optional<Club> findById(Long id) {
-        return clubJpaRepository.findById(id).map(this::toDomain);
-    }
-
-    @Override
-    public List<Club> findAll() {
-        return clubJpaRepository.findAll().stream().map(this::toDomain).toList();
-    }
-
-    // --- PerformanceRepository ---
 
     @Override
     public Performance save(Performance performance) {
@@ -69,26 +47,6 @@ public class PerformanceRepositoryImpl implements PerformanceRepository, ClubRep
     public List<PerformanceLineup> findLineupByMusicianId(Long musicianId) {
         return lineupJpaRepository.findByMusicianId(musicianId).stream()
                 .map(this::toDomain).toList();
-    }
-
-    // --- Mappers ---
-
-    private Club toDomain(ClubJpaEntity entity) {
-        return Club.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .location(entity.getLocation())
-                .instagramUrl(entity.getInstagramUrl())
-                .build();
-    }
-
-    private ClubJpaEntity toJpaEntity(Club club) {
-        return ClubJpaEntity.builder()
-                .id(club.getId())
-                .name(club.getName())
-                .location(club.getLocation())
-                .instagramUrl(club.getInstagramUrl())
-                .build();
     }
 
     private Performance toDomain(PerformanceJpaEntity entity) {

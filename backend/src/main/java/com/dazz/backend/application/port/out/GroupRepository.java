@@ -16,7 +16,7 @@ public interface GroupRepository {
 
     List<GroupMember> findMembersByGroupId(Long groupId);
 
-    List<GroupMember> findGroupsByMusicianId(Long musicianId);
+    List<Group> findGroupsByMusicianId(Long musicianId);
 
     boolean existsMember(Long groupId, Long musicianId);
 }

@@ -1,4 +1,4 @@
-package com.dazz.backend.infrastructure.persistence.performance;
+package com.dazz.backend.infrastructure.persistence.club;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
