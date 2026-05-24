@@ -21,7 +21,7 @@ public class Group {
     private Group(Long id, String groupName, List<String> genreTags, String description) {
         this.id = id;
         this.groupName = groupName;
-        this.genreTags = genreTags;
+        this.genreTags = genreTags != null ? List.copyOf(genreTags) : List.of();
         this.description = description;
     }
 }

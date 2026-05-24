@@ -3,6 +3,7 @@ package com.dazz.backend.application.musician;
 import com.dazz.backend.application.musician.command.MusicianRegisterCommand;
 import com.dazz.backend.application.port.out.MusicianRepository;
 import com.dazz.backend.domain.musician.Musician;
+import com.dazz.backend.domain.musician.exception.MusicianAlreadyClaimedException;
 import com.dazz.backend.domain.musician.exception.MusicianNotFoundException;
 import com.dazz.backend.domain.musician.exception.MusicianUserAlreadyLinkedException;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,9 @@ public class MusicianCommandService {
         Musician musician = musicianRepository.findByUuid(uuid)
                 .orElseThrow(() -> new MusicianNotFoundException(uuid));
 
+        if (musician.isClaimed()) {
+            throw new MusicianAlreadyClaimedException(uuid);
+        }
         if (musicianRepository.existsByUserId(userId)) {
             throw new MusicianUserAlreadyLinkedException(userId);
         }
