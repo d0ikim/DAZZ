@@ -40,6 +40,13 @@ public class MusicianRepositoryImpl implements MusicianRepository {
     }
 
     @Override
+    public List<Musician> findAllByIds(List<Long> ids) {
+        return jpaRepository.findAllById(ids).stream()
+                .map(MusicianPersistenceMapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public boolean existsByUserId(Long userId) {
         return jpaRepository.existsByUserId(userId);
     }

@@ -19,5 +19,7 @@ public interface MusicianRepository {
 
     List<Musician> findAll();
 
+    List<Musician> findAllByIds(List<Long> ids);
+
     boolean existsByUserId(Long userId);
 }
