@@ -26,4 +26,9 @@ public class Collaboration {
         this.relationType = relationType;
         this.weight = weight;
     }
+
+    public Collaboration incrementWeight() {
+        return new Collaboration(this.id, this.fromMusicianId, this.toMusicianId,
+                this.relationType, this.weight + 1);
+    }
 }
