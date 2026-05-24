@@ -1,5 +1,6 @@
 package com.dazz.backend.domain.musician;
 
+import com.dazz.backend.domain.musician.exception.MusicianAlreadyClaimedException;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -46,22 +47,18 @@ public class Musician {
 
     /**
      * 사용자가 본인 계정을 뮤지션 프로필에 연결할 때 사용.
-     * userId가 이미 존재하면 호출부에서 예외를 던져야 한다.
+     * 이미 claim된 프로필에 재시도하면 도메인이 직접 예외를 던진다.
+     *
+     * NOTE: Lombok @Builder on private constructor cannot be called from within
+     * the same class (known limitation). Use the private constructor directly.
      */
     public Musician claim(Long userId) {
-        return Musician.builder()
-                .id(this.id)
-                .uuid(this.uuid)
-                .userId(userId)
-                .stageName(this.stageName)
-                .realName(this.realName)
-                .position(this.position)
-                .bio(this.bio)
-                .snsUrl(this.snsUrl)
-                .profileImageUrl(this.profileImageUrl)
-                .verificationTier(VerificationTier.UNVERIFIED)
-                .createdAt(this.createdAt)
-                .build();
+        if (this.isClaimed()) {
+            throw new MusicianAlreadyClaimedException(this.uuid);
+        }
+        return new Musician(this.id, this.uuid, userId, this.stageName, this.realName,
+                this.position, this.bio, this.snsUrl, this.profileImageUrl,
+                VerificationTier.UNVERIFIED, this.createdAt);
     }
 
     public boolean isClaimed() {
