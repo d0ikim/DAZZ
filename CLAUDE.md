@@ -91,30 +91,22 @@ DAZZ 프로젝트에서 너의 역할은 단순한 코드 생성기가 아니라
 
 ---
 
-## 5. Coding Convention 핵심 요약
+## 5. Coding Convention
 
-> 전체 컨벤션 및 Anti-Pattern → **`/docs/06-conventions.md`**
+> 전체 규칙 및 Anti-Pattern → **`/docs/06-conventions.md`** (AI는 코딩 작업 시 항상 참조)
 
-### 5.1 반드시 지킬 것 (DO)
+핵심 3가지:
+- **생성자 주입** (`@RequiredArgsConstructor`) — `@Autowired` 금지
+- **Entity → DTO 변환** — Controller 직반환 금지, 항상 record DTO
+- **BusinessException 계층** — `throw new RuntimeException(...)` 금지
 
-- **생성자 주입** (`@RequiredArgsConstructor`) — `@Autowired` 필드 주입 금지
-- **DTO 변환**: Entity를 Controller에서 직접 반환 금지. 응답은 항상 DTO(record 권장)
-- **커스텀 예외**: `BusinessException` 계층을 정의하고 사용. `throw new RuntimeException(...)` 금지
-- **테스트**: `Given-When-Then` BDD 주석. 성공 케이스 + 예외 케이스(Unhappy Path) 최소 1개씩
-- **N+1 방어**: JPA 사용 시 Fetch Join 또는 `@BatchSize`를 우선 검토
-- **Wiki 동기화**: 설계/아키텍처/API/도메인 변경 시 `/wiki` 하위 관련 문서를 **반드시 함께 업데이트**한다. 코드와 문서는 항상 동기화 상태를 유지한다.
-- **[문서 자동 동기화 (강제)]**: `src/` 하위의 코드를 새로 생성하거나, 기존 기능을 변경/수정/삭제한 경우, **코딩 직후 자동으로 다음 경로의 문서를 검토하고 함께 업데이트**해야 한다.
-    - `/docs` 하위 관련 마크다운 파일 (요구사항, 아키텍처, API 스펙 등)
-    - `/wiki` 하위 관련 설명 문서
-    - 코드와 문서는 항상 완전히 동기화된 상태여야 하며, 작업 완료 보고 시 "업데이트된 문서 목록"을 함께 명시하라.
+### 5.1 문서 자동 동기화 (강제)
 
-### 5.2 절대 하지 말 것 (DON'T)
+`src/` 하위 코드 생성/변경/삭제 시 **코딩 직후 자동으로** 업데이트:
+- `/docs` 하위 관련 마크다운 파일 (요구사항, 아키텍처, API 스펙 등)
+- `/wiki` 하위 관련 설명 문서
 
-- Entity의 `@Data` 사용 (Setter 노출 + 양방향 참조 무한루프 위험) — DTO에만 한정
-- Controller에 비즈니스 로직 작성 — Application/Domain Service로 위임
-- Domain 계층에 JPA/HTTP 어노테이션 직접 의존 — Port 인터페이스로 추상화
-- 메서드 길이 20라인 초과 — 책임 분리 검토
-- 락 안에서 트랜잭션을 여는 구조 → **반드시 Facade 패턴으로 락이 트랜잭션을 감싸도록** (`/docs/07-concurrency.md` 참조)
+작업 완료 보고 시 **"업데이트된 문서 목록"을 함께 명시**하라.
 
 ---
 
