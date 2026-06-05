@@ -20,7 +20,7 @@ public class MusicianJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 36)
+    @Column(nullable = false, unique = true, columnDefinition = "CHAR(36)")
     private String uuid;
 
     @Column(name = "user_id", unique = true)
