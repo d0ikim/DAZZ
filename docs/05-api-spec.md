@@ -107,6 +107,7 @@ Production : https://api.dazz.kr
 | 코드 | 내부코드 | HTTP | 의미 |
 | --- | --- | --- | --- |
 | `INVALID_INPUT` | COM001 | 400 | 요청 파라미터 검증 실패 / 필수 필드 누락 |
+| `IDEMPOTENCY_CONFLICT` | COM002 | 409 | 동일 Idempotency-Key + 다른 페이로드 재요청 |
 | `INTERNAL_SERVER_ERROR` | COM999 | 500 | 서버 내부 오류 |
 
 ### 뮤지션 (M)
@@ -133,6 +134,7 @@ Production : https://api.dazz.kr
 | --- | --- | --- | --- |
 | `COLLABORATION_DUPLICATE` | C001 | 409 | 동일 (from, to, type) 협업 관계 중복 |
 | `COLLABORATION_SELF_REFERENCE` | C002 | 400 | 자기 자신과의 협업 등록 시도 |
+| `COLLABORATION_CONCURRENT` | C003 | 409 | 동시 요청 충돌 — 분산락 획득 실패 (잠시 후 재시도) |
 
 ### 그룹 (G)
 
@@ -270,23 +272,41 @@ Production : https://api.dazz.kr
 ### 3.6 Collaboration (협업 — 쓰기 API)
 
 #### `POST /api/v1/collaborations`
-- **인증**: 필수 (Verified Pro)
-- **헤더**: `Idempotency-Key: {uuid}` **필수**
+- **인증**: 필수 (`Authorization: Bearer {token}`)
+- **헤더**: `Idempotency-Key: {uuid}` **필수** — 클라이언트가 매 요청마다 고유한 UUID 생성
 - **요청 본문**
   ```json
   {
-    "fromMusicianUuid": "...",
-    "toMusicianUuid": "...",
-    "relationType": "COLLABORATION",
-    "albumId": 451,
-    "performedAt": "2026-04-12"
+    "fromMusicianId": 102,
+    "toMusicianId": 205,
+    "relationType": "COLLABORATION"
   }
   ```
-- **응답 202 Accepted**
+- **응답 201 Created** (신규 협업 관계)
   ```json
-  { "success": true, "data": { "collaborationId": 1234, "weight": 8 } }
+  {
+    "success": true,
+    "data": {
+      "id": 1,
+      "fromMusicianId": 102,
+      "toMusicianId": 205,
+      "relationType": "COLLABORATION",
+      "weight": 1,
+      "created": true
+    }
+  }
   ```
-- **동시성 제어** → `/docs/07-concurrency.md`
+- **응답 200 OK** (기존 관계 weight 증가, `created: false`)
+- **에러**
+  | 상황 | HTTP | 코드 |
+  | --- | --- | --- |
+  | Idempotency-Key 헤더 누락 | 400 | COM001 |
+  | 자기 자신과 협업 | 400 | C002 |
+  | 뮤지션 없음 | 404 | M001 |
+  | 동시 요청 충돌 | 409 | C003 |
+  | 동일 키 + 다른 페이로드 | 409 | COM002 |
+- **방향 정규화**: `fromMusicianId`/`toMusicianId` 순서 무관하게 내부적으로 `min:max`로 저장
+- **동시성/멱등성 상세** → `/docs/07-concurrency.md`
 
 ---
 

@@ -3,7 +3,7 @@
 **Summary**: 두 뮤지션 사이의 협업 관계를 나타내는 Self-referencing 엔티티. weight(협업 횟수)가 관계도의 엣지 굵기를 결정한다.
 **Tags**: #domain #entity #relationship-graph #concurrency
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-06-05
 
 ---
 
@@ -58,9 +58,17 @@ weight는 반드시 [[concepts/collaboration-weight]] 의 분산락 패턴으로
 단순 `weight++` 코드 작성 금지.
 
 ```
-✅ CollaborationFacade → 락 획득 → CollaborationService.updateWeightTransactional()
+✅ CollaborationFacade.linkOrIncrement()
+     → Redisson 락 획득
+     → CollaborationCommandService.linkOrIncrement() @Transactional
+     → Collaboration.incrementWeight() (불변 객체 → 새 인스턴스 반환)
+     → repository.save()
+     → 트랜잭션 커밋
+     → 락 해제
 ❌ repository.findById().get().incrementWeight() // 락 없이 직접 수정
 ```
+
+**구현 완료 API**: `POST /api/v1/collaborations` (Idempotency-Key 필수)
 
 ---
 
