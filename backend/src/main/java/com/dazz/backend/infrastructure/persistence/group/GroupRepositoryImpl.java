@@ -38,9 +38,14 @@ public class GroupRepositoryImpl implements GroupRepository {
 
     @Override
     public List<Group> findGroupsByMusicianId(Long musicianId) {
-        return memberJpaRepository.findByMusicianId(musicianId).stream()
-                .map(m -> groupJpaRepository.findById(m.getGroupId()).map(this::toDomain).orElse(null))
-                .filter(g -> g != null)
+        List<Long> groupIds = memberJpaRepository.findByMusicianId(musicianId).stream()
+                .map(GroupMemberJpaEntity::getGroupId)
+                .toList();
+        if (groupIds.isEmpty()) {
+            return List.of();
+        }
+        return groupJpaRepository.findAllById(groupIds).stream()
+                .map(this::toDomain)
                 .toList();
     }
 
