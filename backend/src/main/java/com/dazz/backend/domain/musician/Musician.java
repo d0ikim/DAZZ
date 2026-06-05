@@ -2,6 +2,8 @@ package com.dazz.backend.domain.musician;
 
 import com.dazz.backend.domain.musician.exception.MusicianAlreadyClaimedException;
 import com.dazz.backend.domain.musician.exception.MusicianInvalidException;
+import com.dazz.backend.domain.musician.exception.MusicianNotApprovableException;
+import com.dazz.backend.domain.musician.exception.MusicianNotRejectableException;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -78,6 +80,32 @@ public class Musician {
         return new Musician(this.id, this.uuid, userId, this.stageName, this.realName,
                 this.position, this.bio, this.snsUrl, this.profileImageUrl,
                 VerificationTier.UNVERIFIED, this.createdAt);
+    }
+
+    /**
+     * 관리자가 UNVERIFIED 뮤지션을 승인. VERIFIED_USER로 승격.
+     * EC-01: UNVERIFIED 상태인 뮤지션에만 적용 가능.
+     */
+    public Musician approve() {
+        if (this.verificationTier != VerificationTier.UNVERIFIED) {
+            throw new MusicianNotApprovableException(this.uuid);
+        }
+        return new Musician(this.id, this.uuid, this.userId, this.stageName, this.realName,
+                this.position, this.bio, this.snsUrl, this.profileImageUrl,
+                VerificationTier.VERIFIED_USER, this.createdAt);
+    }
+
+    /**
+     * 관리자가 UNVERIFIED 뮤지션을 거절. PUBLIC_PROFILE로 복귀 + userId null 해제.
+     * EC-01: UNVERIFIED 상태인 뮤지션에만 적용 가능.
+     */
+    public Musician reject() {
+        if (this.verificationTier != VerificationTier.UNVERIFIED) {
+            throw new MusicianNotRejectableException(this.uuid);
+        }
+        return new Musician(this.id, this.uuid, null, this.stageName, this.realName,
+                this.position, this.bio, this.snsUrl, this.profileImageUrl,
+                VerificationTier.PUBLIC_PROFILE, this.createdAt);
     }
 
     public boolean isClaimed() {
