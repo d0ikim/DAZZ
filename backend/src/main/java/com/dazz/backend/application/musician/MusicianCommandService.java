@@ -20,14 +20,14 @@ public class MusicianCommandService {
     private final MusicianRepository musicianRepository;
 
     public Musician register(MusicianRegisterCommand command) {
-        Musician musician = Musician.builder()
-                .stageName(command.stageName())
-                .realName(command.realName())
-                .position(command.position())
-                .bio(command.bio())
-                .snsUrl(command.snsUrl())
-                .profileImageUrl(command.profileImageUrl())
-                .build();
+        Musician musician = Musician.register(
+                command.stageName(),
+                command.realName(),
+                command.position(),
+                command.bio(),
+                command.snsUrl(),
+                command.profileImageUrl()
+        );
         return musicianRepository.save(musician);
     }
 

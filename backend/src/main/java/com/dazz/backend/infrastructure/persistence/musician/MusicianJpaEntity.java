@@ -4,6 +4,7 @@ import com.dazz.backend.domain.musician.Position;
 import com.dazz.backend.domain.musician.VerificationTier;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,7 @@ public class MusicianJpaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 36)
+    @Column(nullable = false, unique = true, columnDefinition = "CHAR(36)")
     private String uuid;
 
     @Column(name = "user_id", unique = true)
@@ -48,6 +49,7 @@ public class MusicianJpaEntity {
     @Column(name = "verification_tier", nullable = false, length = 20)
     private VerificationTier verificationTier;
 
-    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }

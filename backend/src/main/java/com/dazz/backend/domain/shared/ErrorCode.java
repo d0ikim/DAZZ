@@ -8,6 +8,7 @@ public enum ErrorCode {
     MUSICIAN_NOT_FOUND(404, "M001", "뮤지션을 찾을 수 없습니다."),
     MUSICIAN_ALREADY_CLAIMED(409, "M002", "이미 본인 인증된 뮤지션입니다."),
     MUSICIAN_USER_ALREADY_LINKED(409, "M003", "해당 사용자는 이미 다른 뮤지션과 연결되어 있습니다."),
+    MUSICIAN_CLAIM_CONFLICT(409, "M004", "다른 요청이 진행 중입니다. 잠시 후 다시 시도하세요."),
 
     ALBUM_NOT_FOUND(404, "A001", "앨범을 찾을 수 없습니다."),
     ALBUM_PARTICIPATION_DUPLICATE(409, "A002", "이미 등록된 앨범 참여 정보입니다."),
