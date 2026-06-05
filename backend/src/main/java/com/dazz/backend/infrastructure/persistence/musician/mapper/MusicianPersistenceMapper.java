@@ -5,7 +5,6 @@ import com.dazz.backend.domain.musician.Musician;
 import com.dazz.backend.infrastructure.persistence.musician.CollaborationJpaEntity;
 import com.dazz.backend.infrastructure.persistence.musician.MusicianJpaEntity;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class MusicianPersistenceMapper {
@@ -40,7 +39,7 @@ public class MusicianPersistenceMapper {
                 .snsUrl(musician.getSnsUrl())
                 .profileImageUrl(musician.getProfileImageUrl())
                 .verificationTier(musician.getVerificationTier())
-                .createdAt(musician.getCreatedAt() != null ? musician.getCreatedAt() : LocalDateTime.now())
+                .createdAt(musician.getCreatedAt())
                 .build();
     }
 
