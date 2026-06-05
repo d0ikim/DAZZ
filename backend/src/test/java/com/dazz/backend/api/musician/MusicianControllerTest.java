@@ -106,7 +106,7 @@ class MusicianControllerTest {
         mockMvc.perform(get("/api/v1/musicians/999/insights"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.data.code").value("M001"));
+                .andExpect(jsonPath("$.error.code").value("M001"));
     }
 
     @Test
@@ -116,6 +116,6 @@ class MusicianControllerTest {
         mockMvc.perform(get("/api/v1/musicians/102/insights?depth=3"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.data.code").value("COM001"));
+                .andExpect(jsonPath("$.error.code").value("COM001"));
     }
 }

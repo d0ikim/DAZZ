@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleBusinessException(BusinessException e) {
+    public ResponseEntity<ApiResponse<?>> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleValidation(MethodArgumentNotValidException e) {
+    public ResponseEntity<ApiResponse<?>> handleValidation(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.joining(", "));
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleConstraintViolation(ConstraintViolationException e) {
+    public ResponseEntity<ApiResponse<?>> handleConstraintViolation(ConstraintViolationException e) {
         String message = e.getConstraintViolations().stream()
                 .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
                 .collect(Collectors.joining(", "));
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<ErrorResponse>> handleUnexpected(Exception e) {
+    public ResponseEntity<ApiResponse<?>> handleUnexpected(Exception e) {
         log.error("Unhandled exception", e);
         return ResponseEntity
                 .status(500)
