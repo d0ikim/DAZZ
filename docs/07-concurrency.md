@@ -3,6 +3,9 @@
 > 본 문서는 **'협업 가중치 업데이트'**를 중심으로 동시성 문제를 다룹니다.
 > 모든 멀티스레드 환경의 쓰기 로직은 본 문서의 패턴을 따라야 합니다.
 
+> **구현 상태**: ✅ `POST /api/v1/collaborations` 구현 완료
+> 핵심 클래스: `CollaborationFacade` (락+멱등성) → `CollaborationCommandService` (@Transactional)
+
 ---
 
 ## 1. 문제 원인 분석 (Root Cause)
@@ -92,57 +95,52 @@ public void updateWeight(...) {
 ### 3.2 해결: Facade 패턴
 
 ```java
+// ✅ 실제 구현 클래스 (application/collaboration/)
 @Component
 @RequiredArgsConstructor
-public class CollaborationFacade {
+public class CollaborationFacade {                      // 1. 락 + 멱등성 관리
     private final RedissonClient redissonClient;
-    private final CollaborationService collaborationService;
+    private final CollaborationCommandService commandService;
+    private final IdempotencyRepository idempotencyRepository;
 
-    public CollaborationResult updateWeight(Long aId, Long bId, ...) {
-        // 1. 락을 먼저 잡고
-        String key = lockKey(aId, bId);
-        RLock lock = redissonClient.getLock(key);
+    public CollaborationResult linkOrIncrement(String idempotencyKey, CollaborationLinkCommand command) {
+        // 멱등성 캐시 확인 (Redis HIT → 즉시 반환)
+        Optional<String> cached = idempotencyRepository.find(idempotencyKey);
+        if (cached.isPresent()) {
+            return deserializeCached(idempotencyKey, buildPayloadHash(command), cached.get());
+        }
 
+        String lockKey = buildLockKey(command.fromMusicianId(), command.toMusicianId());
+        RLock lock = redissonClient.getLock(lockKey);
         try {
             if (!lock.tryLock(2, 5, TimeUnit.SECONDS)) {
-                throw new ConcurrentUpdateException(key);
+                throw new CollaborationConcurrentException(command.fromMusicianId(), command.toMusicianId());
             }
-
-            // 2. 트랜잭션이 락 내부에서 시작/커밋
-            return collaborationService.updateWeightTransactional(aId, bId, ...);
-            // ↑ @Transactional이 붙은 메서드: 시작 → 로직 → 커밋
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ConcurrentUpdateException(key);
+            CollaborationResult result = commandService.linkOrIncrement(command); // @Transactional → 커밋
+            cacheResult(idempotencyKey, buildPayloadHash(command), result);
+            return result;
         } finally {
-            // 4. 락 해제 (트랜잭션은 이미 커밋된 상태)
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            if (lock.isHeldByCurrentThread()) lock.unlock(); // 4. 락 해제 (트랜잭션 커밋 후)
         }
-    }
-
-    private String lockKey(Long aId, Long bId) {
-        long min = Math.min(aId, bId);
-        long max = Math.max(aId, bId);
-        return String.format("collab:lock:%d:%d", min, max);
     }
 }
 
 @Service
 @RequiredArgsConstructor
-public class CollaborationService {
-    private final CollaborationRepository repository;
-
+@Transactional(readOnly = true)
+public class CollaborationCommandService {              // 2. @Transactional 비즈니스 로직
     @Transactional
-    public CollaborationResult updateWeightTransactional(Long aId, Long bId, ...) {
-        // 락이 잡혀있는 상태에서 안전하게 Read-Modify-Write
-        Collaboration collab = repository.findByPair(aId, bId)
-            .orElseGet(() -> Collaboration.newPair(aId, bId));
-        collab.incrementWeight();
-        repository.save(collab);
-        return CollaborationResult.of(collab);
+    public CollaborationResult linkOrIncrement(CollaborationLinkCommand command) {
+        // 락이 잡혀있는 상태 → 안전한 Read-Modify-Write
+        long minId = Math.min(command.fromMusicianId(), command.toMusicianId());
+        long maxId = Math.max(command.fromMusicianId(), command.toMusicianId());
+        Optional<Collaboration> existing =
+            collaborationRepository.findByFromAndToAndType(minId, maxId, command.relationType());
+        if (existing.isPresent()) {
+            return CollaborationResult.of(collaborationRepository.save(existing.get().incrementWeight()), false);
+        }
+        return CollaborationResult.of(
+            collaborationRepository.save(Collaboration.newPair(minId, maxId, command.relationType())), true);
     }
 }
 ```

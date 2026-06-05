@@ -3,7 +3,8 @@
 **Summary**: 두 뮤지션이 함께 연주한 횟수. 관계도의 엣지 굵기를 결정하며, 동시 업데이트 시 Lost Update가 발생하므로 반드시 분산락으로 보호해야 한다.
 **Tags**: #domain #concurrency #redis #relationship-graph
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-06-05
+**구현 상태**: ✅ `POST /api/v1/collaborations` 구현 완료
 
 ---
 
@@ -49,14 +50,18 @@ collab:lock:{min(aId, bId)}:{max(aId, bId)}
 ```
 항상 작은 ID가 앞에 와서 (A→B)와 (B→A)가 같은 락을 잡도록 보장.
 
-### 코드 구조 (절대 원칙)
+### 실제 구현 구조
 ```
-Facade (락 관리)
-  └── 락 획득
-        └── Service.updateWeightTransactional() ← @Transactional
-              └── Read → Modify → Write
-        └── 트랜잭션 커밋
-  └── 락 해제
+CollaborationFacade (락 + 멱등성)
+  └── IdempotencyRepository.find()       ← Redis HIT → 즉시 반환
+  └── RedissonClient.getLock(lockKey)    ← 락 획득
+        └── CollaborationCommandService.linkOrIncrement() ← @Transactional
+              └── min:max 정규화 → findByFromAndToAndType()
+              └── 신규: Collaboration.newPair() → save()
+              └── 기존: existing.incrementWeight() → save()
+              └── [트랜잭션 커밋]
+  └── IdempotencyRepository.save()       ← Redis에 결과 캐시 (TTL 24h)
+  └── lock.unlock()                      ← 락 해제 (커밋 이후)
 ```
 
 **락이 트랜잭션을 감싸야 한다. 반대 순서 절대 금지.**

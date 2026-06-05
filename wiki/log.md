@@ -1,4 +1,4 @@
-커밋# DAZZ LLM Wiki — Change Log
+# DAZZ LLM Wiki — Change Log
 
 **규칙**:
 - 최신 항목이 맨 위에 온다
@@ -7,6 +7,29 @@
 - Wiki 페이지를 추가하거나 수정할 때마다 반드시 여기 기록한다
 
 ---
+
+## 2026-06
+
+- 2026-06-05 — created — `domain/musician/exception/CollaborationDuplicateException` — C001 협업 중복 예외 → [[entities/collaboration]]
+- 2026-06-05 — created — `domain/musician/exception/CollaborationSelfReferenceException` — C002 자기참조 예외 → [[entities/collaboration]]
+- 2026-06-05 — created — `domain/musician/exception/CollaborationConcurrentException` — C003 분산락 획득 실패 예외 → [[concepts/collaboration-weight]]
+- 2026-06-05 — created — `domain/musician/exception/IdempotencyConflictException` — COM002 동일 키 + 다른 페이로드 예외 → [[concepts/collaboration-weight]]
+- 2026-06-05 — updated — `domain/shared/ErrorCode` — C003(COLLABORATION_CONCURRENT), COM002(IDEMPOTENCY_CONFLICT) 추가 → [[entities/collaboration]]
+- 2026-06-05 — updated — `domain/musician/Collaboration` — newPair() 정적 팩토리 추가 (weight=1 초기값 강제화) → [[entities/collaboration]]
+- 2026-06-05 — created — `application/collaboration/CollaborationCommandService` — linkOrIncrement() @Transactional 서비스, min:max 정규화 → [[concepts/collaboration-weight]]
+- 2026-06-05 — created — `application/collaboration/CollaborationFacade` — Redisson 분산락 + 멱등성 캐시 외부 계층 → [[concepts/collaboration-weight]] · [[entities/redis]]
+- 2026-06-05 — created — `application/port/out/IdempotencyRepository` — Redis 멱등성 저장소 포트 → [[entities/redis]]
+- 2026-06-05 — created — `infrastructure/cache/IdempotencyRepositoryImpl` — Redisson RBucket 기반 구현 (KEY: idempotency:{key}) → [[entities/redis]]
+- 2026-06-05 — updated — `api/common/GlobalExceptionHandler` — MissingRequestHeaderException 핸들러 추가 (Idempotency-Key 누락 → 400) → [[concepts/hexagonal-architecture]]
+- 2026-06-05 — created — `api/collaboration/CollaborationController` — POST /api/v1/collaborations (신규 201 / 기존 200) → [[entities/collaboration]]
+- 2026-06-05 — created — `api/collaboration/dto/CollaborationRequest` — fromMusicianId, toMusicianId, relationType → [[entities/collaboration]]
+- 2026-06-05 — created — `api/collaboration/dto/CollaborationResponse` — id, weight, created 플래그 포함 → [[entities/collaboration]]
+- 2026-06-05 — created — `test/application/collaboration/CollaborationCommandServiceTest` — 단위 테스트 5개 (신규/증가/정규화/자기참조/뮤지션없음) → [[entities/collaboration]]
+- 2026-06-05 — created — `test/api/collaboration/CollaborationControllerTest` — 단위 테스트 6개 (201/200/헤더누락/C002/M001/C003/COM002) → [[entities/collaboration]]
+- 2026-06-05 — updated — `docs/05-api-spec.md` — 협업 API 명세 실제 구현과 동기화, C003/COM002 에러코드 추가
+- 2026-06-05 — updated — `docs/07-concurrency.md` — 실제 구현 클래스명(CollaborationFacade/CommandService)으로 코드 예시 갱신, 구현 완료 표시
+- 2026-06-05 — updated — [[concepts/collaboration-weight]] — 실제 구현 흐름으로 코드 구조 갱신, 구현 완료 표시
+- 2026-06-05 — updated — [[entities/collaboration]] — weight 업데이트 패턴 실제 클래스명으로 갱신, 구현 완료 API 명시
 
 ## 2026-05
 
