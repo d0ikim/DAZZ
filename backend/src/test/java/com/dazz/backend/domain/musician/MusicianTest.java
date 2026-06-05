@@ -2,6 +2,8 @@
 package com.dazz.backend.domain.musician;
 
 import com.dazz.backend.domain.musician.exception.MusicianAlreadyClaimedException;
+import com.dazz.backend.domain.musician.exception.MusicianNotApprovableException;
+import com.dazz.backend.domain.musician.exception.MusicianNotRejectableException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -69,5 +71,112 @@ class MusicianTest {
 
         // Then
         assertThat(musician.getUuid()).isNotNull();
+    }
+
+    // ── approve() ───────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("approve() - UNVERIFIED 뮤지션을 승인하면 VERIFIED_USER로 승격되고 userId는 유지된다")
+    void approve_success() {
+        // Given: claim된 UNVERIFIED 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .userId(42L)
+                .verificationTier(VerificationTier.UNVERIFIED)
+                .build();
+
+        // When
+        Musician approved = musician.approve();
+
+        // Then
+        assertThat(approved.getVerificationTier()).isEqualTo(VerificationTier.VERIFIED_USER);
+        assertThat(approved.getUserId()).isEqualTo(42L);
+        // 원본 객체는 변하지 않는다 (불변 객체)
+        assertThat(musician.getVerificationTier()).isEqualTo(VerificationTier.UNVERIFIED);
+    }
+
+    @Test
+    @DisplayName("approve() - VERIFIED_USER인 뮤지션에 승인 시도하면 MusicianNotApprovableException 발생")
+    void approve_throwsException_whenAlreadyVerifiedUser() {
+        // Given: 이미 VERIFIED_USER인 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .userId(42L)
+                .verificationTier(VerificationTier.VERIFIED_USER)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> musician.approve())
+                .isInstanceOf(MusicianNotApprovableException.class);
+    }
+
+    @Test
+    @DisplayName("approve() - PUBLIC_PROFILE 뮤지션에 승인 시도하면 MusicianNotApprovableException 발생")
+    void approve_throwsException_whenPublicProfile() {
+        // Given: claim되지 않은 PUBLIC_PROFILE 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> musician.approve())
+                .isInstanceOf(MusicianNotApprovableException.class);
+    }
+
+    // ── reject() ────────────────────────────────────────────────────────────
+
+    @Test
+    @DisplayName("reject() - UNVERIFIED 뮤지션을 거절하면 PUBLIC_PROFILE로 복귀하고 userId가 null이 된다")
+    void reject_success() {
+        // Given: claim된 UNVERIFIED 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .userId(42L)
+                .verificationTier(VerificationTier.UNVERIFIED)
+                .build();
+
+        // When
+        Musician rejected = musician.reject();
+
+        // Then
+        assertThat(rejected.getVerificationTier()).isEqualTo(VerificationTier.PUBLIC_PROFILE);
+        assertThat(rejected.getUserId()).isNull();
+        assertThat(rejected.isClaimed()).isFalse();
+        // 원본 객체는 변하지 않는다 (불변 객체)
+        assertThat(musician.getUserId()).isEqualTo(42L);
+    }
+
+    @Test
+    @DisplayName("reject() - PUBLIC_PROFILE 뮤지션에 거절 시도하면 MusicianNotRejectableException 발생")
+    void reject_throwsException_whenPublicProfile() {
+        // Given: claim되지 않은 PUBLIC_PROFILE 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> musician.reject())
+                .isInstanceOf(MusicianNotRejectableException.class);
+    }
+
+    @Test
+    @DisplayName("reject() - VERIFIED_USER 뮤지션에 거절 시도하면 MusicianNotRejectableException 발생")
+    void reject_throwsException_whenVerifiedUser() {
+        // Given: 이미 VERIFIED_USER인 뮤지션
+        Musician musician = Musician.builder()
+                .stageName("김재즈")
+                .position(Position.PIANO)
+                .userId(42L)
+                .verificationTier(VerificationTier.VERIFIED_USER)
+                .build();
+
+        // When & Then
+        assertThatThrownBy(() -> musician.reject())
+                .isInstanceOf(MusicianNotRejectableException.class);
     }
 }

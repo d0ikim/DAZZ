@@ -117,6 +117,9 @@ Production : https://api.dazz.kr
 | `MUSICIAN_NOT_FOUND` | M001 | 404 | uuid/id에 해당하는 뮤지션 없음 |
 | `MUSICIAN_ALREADY_CLAIMED` | M002 | 409 | 이미 본인 계정이 연결된 뮤지션에 재claim 시도 |
 | `MUSICIAN_USER_ALREADY_LINKED` | M003 | 409 | 해당 User가 이미 다른 뮤지션 프로필과 연결됨 (EC-01) |
+| `MUSICIAN_CLAIM_CONFLICT` | M004 | 409 | 동시 claim 요청 충돌 — 잠시 후 재시도 |
+| `MUSICIAN_NOT_APPROVABLE` | M005 | 409 | 승인 불가 — UNVERIFIED 상태가 아닌 뮤지션에 approve 시도 (EC-01) |
+| `MUSICIAN_NOT_REJECTABLE` | M006 | 409 | 거절 불가 — UNVERIFIED 상태가 아닌 뮤지션에 reject 시도 (EC-01) |
 
 ### 앨범 (A)
 
@@ -307,7 +310,74 @@ Production : https://api.dazz.kr
 
 ---
 
-### 3.7 Performance (공연)
+### 3.7 Admin — Musician 승인/거절 (EC-01)
+
+> **Base Path**: `/admin/musicians`
+> 인증 미구현 단계. 추후 ADMIN 역할 기반 인증으로 교체 예정.
+
+#### `POST /admin/musicians/{uuid}/approve`
+
+> UNVERIFIED 뮤지션을 VERIFIED_USER로 승인.
+
+- **인증**: 추후 관리자 전용 (현재 미인증 허용)
+- **경로 변수**: `uuid` — 승인할 뮤지션의 UUID
+
+- **응답 200 (성공)**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 1,
+      "uuid": "550e8400-e29b-41d4-a716-446655440000",
+      "stageName": "김재즈",
+      "position": "PIANO",
+      "verificationTier": "VERIFIED_USER",
+      "claimed": true
+    }
+  }
+  ```
+
+- **에러 응답**
+
+  | 상황 | HTTP | 에러코드 |
+  | --- | --- | --- |
+  | uuid에 해당하는 뮤지션 없음 | 404 | M001 |
+  | UNVERIFIED가 아닌 뮤지션에 승인 시도 (이미 VERIFIED_USER/VERIFIED_PRO/PUBLIC_PROFILE) | 409 | M005 |
+
+---
+
+#### `POST /admin/musicians/{uuid}/reject`
+
+> UNVERIFIED 뮤지션을 PUBLIC_PROFILE로 복귀시키고 userId 연결 해제.
+
+- **인증**: 추후 관리자 전용 (현재 미인증 허용)
+- **경로 변수**: `uuid` — 거절할 뮤지션의 UUID
+
+- **응답 200 (성공)**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 1,
+      "uuid": "550e8400-e29b-41d4-a716-446655440000",
+      "stageName": "김재즈",
+      "position": "PIANO",
+      "verificationTier": "PUBLIC_PROFILE",
+      "claimed": false
+    }
+  }
+  ```
+
+- **에러 응답**
+
+  | 상황 | HTTP | 에러코드 |
+  | --- | --- | --- |
+  | uuid에 해당하는 뮤지션 없음 | 404 | M001 |
+  | UNVERIFIED가 아닌 뮤지션에 거절 시도 (이미 PUBLIC_PROFILE/VERIFIED_USER/VERIFIED_PRO) | 409 | M006 |
+
+---
+
+### 3.8 Performance (공연)
 
 #### `GET /api/v1/performances`
 - **Query**: `from`, `to`, `clubId`, `musicianId`, `genre`
