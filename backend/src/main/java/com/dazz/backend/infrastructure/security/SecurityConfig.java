@@ -22,6 +22,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
+                        // TODO: 인증 구현 시 ADMIN 권한 체크로 교체 예정
+                        .requestMatchers("/admin/**").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
