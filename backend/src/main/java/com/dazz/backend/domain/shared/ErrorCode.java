@@ -15,6 +15,7 @@ public enum ErrorCode {
 
     COLLABORATION_DUPLICATE(409, "C001", "이미 존재하는 협업 관계입니다."),
     COLLABORATION_SELF_REFERENCE(400, "C002", "자기 자신과 협업 관계를 맺을 수 없습니다."),
+    COLLABORATION_CONCURRENT(409, "C003", "다른 요청이 진행 중입니다. 잠시 후 다시 시도하세요."),
 
     GROUP_NOT_FOUND(404, "G001", "그룹을 찾을 수 없습니다."),
     GROUP_MEMBER_DUPLICATE(409, "G002", "이미 해당 그룹의 멤버입니다."),
@@ -26,6 +27,7 @@ public enum ErrorCode {
     USER_EMAIL_DUPLICATE(409, "U002", "이미 사용 중인 이메일입니다."),
 
     INVALID_INPUT(400, "COM001", "잘못된 입력입니다."),
+    IDEMPOTENCY_CONFLICT(409, "COM002", "동일한 Idempotency-Key로 다른 페이로드가 요청되었습니다."),
     INTERNAL_SERVER_ERROR(500, "COM999", "서버 내부 오류입니다.");
 
     private final int httpStatus;
