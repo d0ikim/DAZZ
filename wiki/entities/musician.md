@@ -3,7 +3,7 @@
 **Summary**: DAZZ의 핵심 Aggregate Root. 뮤지션 프로필, 신뢰 등급, UUID 기반 식별을 담당한다.
 **Tags**: #domain #aggregate-root #entity
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-24
+**Last Updated**: 2026-06-06
 
 ---
 
@@ -99,6 +99,10 @@ Musician (1) ──── (N) DocentNote
   - Happy 2: `includeNetwork=false` — network 빈 배열 검증
   - Unhappy 1: 존재하지 않는 musicianId → 404 / M001
   - Unhappy 2: `depth=3` 초과 → 400 / COM001
+- **인수 테스트 지원 클래스**:
+  - `MusicianInsightSteps.java` — 인사이트 조회 시나리오 Step 정의
+  - `CommonSteps.java` — 응답 상태코드/에러코드 검증 공통 Step
+  - `ScenarioContext.java` — 시나리오 간 상태 공유 컨텍스트 (`@Scope("cucumber-glue")`)
 
 ## 패키지 위치
 
@@ -116,6 +120,16 @@ infrastructure/persistence/musician/
   ├── MusicianJpaRepository.java       ← Spring Data
   ├── MusicianRepositoryImpl.java      ← Port 구현체
   └── mapper/MusicianPersistenceMapper.java
+
+test/resources/features/
+  └── musician_insights.feature        ← 인수 테스트 시나리오 4개
+test/steps/
+  ├── MusicianInsightSteps.java        ← 인사이트 전용 Step 정의
+  ├── CommonSteps.java                 ← 상태코드/에러코드 공통 Step
+  └── (MusicianClaimSteps.java)        ← claim 관련 Step (ScenarioContext 기반 리팩토링)
+test/support/
+  ├── ScenarioContext.java             ← 시나리오 간 상태 공유 (@Scope("cucumber-glue"))
+  └── TestAdapter.java                 ← HTTP 추상화 (get/post/postWithIdempotencyKey)
 ```
 
 Domain의 `Musician`과 Infrastructure의 `MusicianJpaEntity`는 **별개 클래스**.

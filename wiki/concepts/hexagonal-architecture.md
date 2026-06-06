@@ -3,7 +3,7 @@
 **Summary**: DAZZ의 근간 아키텍처. Domain이 Infrastructure를 모르도록 Port(인터페이스)로 격리한다. 계층 간 역방향 의존 절대 금지.
 **Tags**: #architecture #domain #port #adapter
 **Created**: 2026-05-19
-**Last Updated**: 2026-05-21 (Walking Skeleton 완료)
+**Last Updated**: 2026-06-06
 
 ---
 
@@ -111,11 +111,11 @@ DAZZ는 다양한 외부 의존성을 가진다:
 
 | 인프라 | 컨테이너 내부 | 로컬 접근 포트 | 비고 |
 |---|---|---|---|
-| MySQL 8.0 | 3306 | **3307** | 로컬 MySQL 충돌 방지 |
+| MySQL 8.0 | 3306 | **3306** | - |
 | Redis 7 | 6379 | 6379 | - |
 | Kafka | 9092 | 9092 | - |
 
-Spring Boot `application.yaml`에서 MySQL만 3307로 설정. 나머지는 기본값 사용.
+Spring Boot `application.yaml` MySQL 포트: 3306 (기본값 사용).
 
 ---
 
@@ -155,6 +155,22 @@ Testcontainers는 CI 환경에 유리하지만, 로컬 개발 단계에서는 `d
 - 위치: `src/test/java/com/dazz/backend/support/TestAdapter.java`
 - 모든 step 정의에서 `testAdapter.get("/path")`로 HTTP 호출 통일
 - JWT 인증 필요 시 `getWithToken(path, token)` 메서드 추가로 확장
+- **현재 구현된 메서드**:
+  - `get(path)` — 쿼리 파라미터 없는 GET
+  - `get(path, queryParams)` — `Map<String, Object>` 형태의 쿼리 파라미터 GET
+  - `post(path, body)` — JSON 본문 POST
+  - `postWithIdempotencyKey(path, body, key)` — `Idempotency-Key` 헤더 포함 POST
+
+**ScenarioContext 패턴:**
+- 위치: `src/test/java/com/dazz/backend/support/ScenarioContext.java`
+- `@Scope("cucumber-glue")` — Cucumber 시나리오 1개 = 빈 1개 생성/소멸 (시나리오 간 상태 격리)
+- 보유 필드: `lastResponse`, `lastMusicianUuid`, `musicianIds`
+- 여러 Step 클래스가 동일한 `ScenarioContext` 인스턴스를 `@Autowired`로 공유
+
+**CommonSteps 패턴:**
+- 위치: `src/test/java/com/dazz/backend/steps/CommonSteps.java`
+- 응답 상태코드(`응답 상태코드는 {int} 이다`), 에러코드(`응답의 에러코드는 {string} 이다`) 검증
+- 모든 feature 파일에서 재사용 가능한 공통 Step — 중복 제거 목적
 
 **주의: `@LocalServerPort` 타이밍 버그**
 

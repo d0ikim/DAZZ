@@ -10,6 +10,17 @@
 
 ## 2026-06
 
+aㅗ- 2026-06-06 — updated — [[concepts/hexagonal-architecture]] — MySQL 로컬 포트 3307 → 3306 정정 (실제 동작 확인 기준) → [[concepts/hexagonal-architecture]]
+- 2026-06-06 — created — `test/resources/features/musician_insights.feature` — Happy 2 + Unhappy 2 인수 테스트 시나리오 → [[entities/musician]]
+- 2026-06-06 — created — `test/steps/MusicianInsightSteps.java` — 인사이트 조회 인수 테스트 Step 정의 → [[entities/musician]] · [[concepts/hexagonal-architecture]]
+- 2026-06-06 — created — `test/steps/CommonSteps.java` — 응답 상태코드/에러코드 검증 공통 Step (모든 feature 재사용) → [[concepts/hexagonal-architecture]]
+- 2026-06-06 — created — `test/support/ScenarioContext.java` — @Scope("cucumber-glue") 시나리오 간 상태 공유 컨텍스트 → [[concepts/hexagonal-architecture]]
+- 2026-06-06 — updated — `test/support/TestAdapter.java` — get(queryParams), postWithIdempotencyKey() 메서드 추가 → [[concepts/hexagonal-architecture]]
+- 2026-06-06 — refactored — `test/steps/MusicianClaimSteps.java` — ScenarioContext 기반으로 리팩토링 (기능 변경 없음) → [[concepts/hexagonal-architecture]]
+- 2026-06-06 — updated — `docs/05-api-spec.md` — GET /api/v1/musicians/{musicianId}/insights 인수 테스트 목록 및 depth 파라미터 범위 반영 → [[entities/musician]]
+- 2026-06-06 — updated — [[entities/musician]] — 인사이트 조회 인수 테스트 상세, 테스트 지원 클래스 목록, 패키지 구조 업데이트
+- 2026-06-06 — updated — [[concepts/hexagonal-architecture]] — TestAdapter/ScenarioContext/CommonSteps 패턴 및 feature 파일 목록 추가
+
 - 2026-06-05 — created — `domain/musician/exception/CollaborationDuplicateException` — C001 협업 중복 예외 → [[entities/collaboration]]
 - 2026-06-05 — created — `domain/musician/exception/CollaborationSelfReferenceException` — C002 자기참조 예외 → [[entities/collaboration]]
 - 2026-06-05 — created — `domain/musician/exception/CollaborationConcurrentException` — C003 분산락 획득 실패 예외 → [[concepts/collaboration-weight]]
@@ -82,7 +93,7 @@
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — TestAdapter 패턴 추가: HTTP 추상화 계층, JWT 확장 지점 설계
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — Cucumber 테스트 전략 추가: RANDOM_PORT 이유, TestcontainersConfiguration vs Docker Compose 선택 근거
 - 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — SecurityConfig 적용 결과 추가: 익명 접근 403, JWT 추가 시 401로 전환 예정
-- 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — 로컬 dev 환경 포트 확정 (MySQL 3307, Redis 6379, Kafka 9092) 및 Spring Security 기본 동작 메모 추가
+- 2026-05-21 — updated — `wiki/concepts/hexagonal-architecture.md` — 로컬 dev 환경 포트 확정 (MySQL 3306, Redis 6379, Kafka 9092) 및 Spring Security 기본 동작 메모 추가
 - 2026-05-21 — updated — `wiki/entities/kafka.md` — Spring Boot 3.4.x에서 spring-boot-starter-kafka 대신 spring-kafka 직접 사용으로 변경 반영
 - 2026-05-19 — created — `wiki/decisions/no-docent-note-in-mvp.md` — MVP에서 도슨트 노트 미구현 결정 및 Post-MVP 조건 정리
 - 2026-05-19 — created — `wiki/decisions/monorepo.md` — backend + frontend 모노레포 구성 결정 근거
