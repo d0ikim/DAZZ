@@ -23,6 +23,20 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 10,
+            "statusMessage": "PR 생성 감지 중...",
+            "command": "input=$(cat); echo \"$input\" | python -c \"import sys,json; d=json.load(sys.stdin); cmd=d.get('tool_input',{}).get('command','').strip(); exit(0 if 'pr create' in cmd and cmd.startswith('gh') else 1)\" 2>/dev/null || exit 0; printf '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"[CLAUDE.md 섹션 9 규칙 5 자동 트리거] PR 생성이 감지되었습니다. 지금 즉시 code-review 스킬을 실행하세요. 일반: skill=code-review args=high --comment / 심층(Opus): args=ultra --comment. --comment 옵션으로 리뷰 결과가 PR 인라인 코멘트로 등록됩니다. 이 단계는 생략 불가입니다.\"}}'"
+          }
+        ]
+      }
     ]
   }
 }
