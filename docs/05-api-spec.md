@@ -188,12 +188,18 @@ Production : https://api.dazz.kr
 > 특정 뮤지션의 **프로필 + 도슨트 노트 + 협업 네트워크**를 한 번에 조회. 서비스의 핵심 기능.
 
 - **인증**: 불필요 (공개 API)
+- **구현 상태**: ✅ 구현 완료
+- **인수 테스트**: ✅ Cucumber 시나리오 4개 (`musician_insights.feature`)
+  - Happy Path 1: 협업 네트워크 포함 인사이트 조회 (200)
+  - Happy Path 2: `includeNetwork=false` 시 network 빈 배열 반환 (200)
+  - Unhappy Path 1: 존재하지 않는 뮤지션 ID → 404 / M001
+  - Unhappy Path 2: `depth` 범위 초과(3 이상) → 400 / COM001
 - **Query Parameters**
 
   | 파라미터 | 타입 | 필수 | 기본값 | 설명 |
   | --- | --- | --- | --- | --- |
   | `includeNetwork` | boolean | N | true | 협업 네트워크 포함 여부 |
-  | `depth` | int (1~3) | N | 1 | 네트워크 탐색 깊이 |
+  | `depth` | int (1~2) | N | 1 | 네트워크 탐색 깊이 (MVP: 1~2만 허용, 3 이상 400) |
 
 - **응답 200 (Happy Path)**
   ```json

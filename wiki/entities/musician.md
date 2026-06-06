@@ -92,8 +92,13 @@ Musician (1) ──── (N) DocentNote
 
 - **응답**: 프로필 + docentNote(Post-MVP, 현재 null) + 협업 네트워크
 - **N+1 방지**: `CollaborationRepository.findByMusicianId()` → `MusicianRepository.findAllByIds()` 배치 조회
-- **depth**: 1~2 허용. MVP에서는 depth=1 동작만 구현 (직접 협업자)
+- **depth**: 1~2 허용. MVP에서는 depth=1 동작만 구현 (직접 협업자). depth=3 이상 → 400 COM001
 - **isVerified**: `verificationTier == VERIFIED_USER || VERIFIED_PRO` 시 true
+- **인수 테스트**: ✅ Cucumber 시나리오 4개 (`musician_insights.feature`)
+  - Happy 1: 협업 네트워크 포함 조회 — profile.stageName, network[0].name 검증
+  - Happy 2: `includeNetwork=false` — network 빈 배열 검증
+  - Unhappy 1: 존재하지 않는 musicianId → 404 / M001
+  - Unhappy 2: `depth=3` 초과 → 400 / COM001
 
 ## 패키지 위치
 

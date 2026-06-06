@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Component
 public class TestAdapter {
 
@@ -26,11 +28,31 @@ public class TestAdapter {
                 .get(path);
     }
 
+    public Response get(String path, Map<String, Object> queryParams) {
+        return RestAssured.given()
+                .port(getPort())
+                .baseUri("http://localhost")
+                .queryParams(queryParams)
+                .when()
+                .get(path);
+    }
+
     public Response post(String path, Object body) {
         return RestAssured.given()
                 .port(getPort())
                 .baseUri("http://localhost")
                 .contentType(ContentType.JSON)
+                .body(body)
+                .when()
+                .post(path);
+    }
+
+    public Response postWithIdempotencyKey(String path, Object body, String idempotencyKey) {
+        return RestAssured.given()
+                .port(getPort())
+                .baseUri("http://localhost")
+                .contentType(ContentType.JSON)
+                .header("Idempotency-Key", idempotencyKey)
                 .body(body)
                 .when()
                 .post(path);
