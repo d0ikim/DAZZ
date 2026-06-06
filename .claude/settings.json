@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 15,
+            "statusMessage": "미커밋 .java 변경 확인 중...",
+            "command": "input=$(cat); echo \"$input\" | grep -Eq 'stop_hook_active[^,}]*true' && exit 0; git status --porcelain 2>/dev/null | grep -q '[.]java$' || exit 0; printf '{\"decision\":\"block\",\"reason\":\"미커밋 .java 변경 감지. dazz-architecture-reviewer 서브에이전트로 현재 git diff의 헥사고날/DDD 규칙 위반을 감사하세요. 위반 없으면 커밋 정보를 제안하고, 이미 리뷰한 diff면 결과만 보고 후 종료하세요.\"}'"
+          }
+        ]
+      }
+    ]
+  }
+}
