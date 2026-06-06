@@ -11,6 +11,17 @@
             "command": "input=$(cat); echo \"$input\" | grep -Eq 'stop_hook_active[^,}]*true' && exit 0; git status --porcelain 2>/dev/null | grep -q '[.]java$' || exit 0; printf '{\"decision\":\"block\",\"reason\":\"미커밋 .java 변경 감지. dazz-architecture-reviewer 서브에이전트로 현재 git diff의 헥사고날/DDD 규칙 위반을 감사하세요. 위반 없으면 커밋 정보를 제안하고, 이미 리뷰한 diff면 결과만 보고 후 종료하세요.\"}'"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "timeout": 15,
+            "statusMessage": "문서 동기화 상태 확인 중...",
+            "command": "input=$(cat); echo \"$input\" | grep -Eq 'stop_hook_active[^,}]*true' && exit 0; java_changed=$(git status --porcelain 2>/dev/null | grep '[.]java$'); docs_changed=$(git status --porcelain 2>/dev/null | grep -E '(docs|wiki)/'); [ -n \"$java_changed\" ] && [ -z \"$docs_changed\" ] && printf '{\"decision\":\"block\",\"reason\":\"코드 변경은 있지만 docs/wiki 문서 동기화가 없습니다. dazz-docs-sync 서브에이전트로 md + index.html + 변경이력 링크를 동기화하세요.\"}' && exit 0; md_changed=$(git status --porcelain 2>/dev/null | grep -E '(docs|wiki)/.*[.]md$'); html_changed=$(git status --porcelain 2>/dev/null | grep 'index[.]html$'); [ -n \"$md_changed\" ] && [ -z \"$html_changed\" ] && printf '{\"decision\":\"block\",\"reason\":\".md 파일이 변경됐지만 index.html 뷰어가 업데이트되지 않았습니다. dazz-docs-sync로 docs/index.html, wiki/index.html도 동기화하세요.\"}'; exit 0"
+          }
+        ]
       }
     ]
   }
